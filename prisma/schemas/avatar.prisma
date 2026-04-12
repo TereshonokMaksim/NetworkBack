@@ -1,0 +1,9 @@
+model Avatar {
+  id                 Int   @id @default(autoincrement())
+  user               User  @relation(fields: [userId], references: [id], name: "userAvatar")
+  userId             Int
+  image              Image @relation(fields: [imageId], references: [id], name: "userImage")
+  imageId            Int   @unique
+  currentUserUsing   User? @relation(name: "currentUserAvatar")
+  currentUserUsingId Int?
+}

@@ -1,0 +1,1 @@
+export const ALL_VERIFICATION_ATTEMPTS: {[key: string]: string} = {}
