@@ -1,4 +1,7 @@
 export class StandartError extends Error {
+    static BadReqError(arg0: string) {
+        throw new Error('Method not implemented.');
+    }
     public readonly status: number;
     constructor(message: string, status: number){
         super(message)
