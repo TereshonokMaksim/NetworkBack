@@ -17,5 +17,5 @@ model User {
   verified         Boolean  @default(false)
   createdAt        DateTime @default(now())
   isAdmin          Boolean  @default(false)
-  albums           Album[]     @relation(name: "userAlbums")
+  albums           Album[]     @relation()
 }
