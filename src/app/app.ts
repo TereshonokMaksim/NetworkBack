@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import { ENV } from "../config/env"
 import { UserRoutes } from "../user/user.router"
+import albumRouter from "../album/album.router"
 
 
 const app = express()
@@ -17,4 +18,5 @@ app.use("/users/", UserRoutes)
 app.listen(PORT, HOST, () => {
     console.log(`Server started on http://${HOST}:${PORT}`)
 })
+app.use('/albums', albumRouter);
 
