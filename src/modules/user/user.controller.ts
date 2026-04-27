@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
-import { AuthenticatedUser } from "../types/standartTypes";
 import { UserControllerContract } from "./types/user.contracts";
 import {
 	LoginCredentials,
 	RegisterCredentials,
-	User,
+	UserPowered,
 } from "./types/user.types";
 import { UserService } from "./user.service";
-import { ValidationError } from "../errors/standartError"
 
 export const UserController: UserControllerContract = {
 	login: async function (
@@ -38,26 +36,40 @@ export const UserController: UserControllerContract = {
 		}
 	},
 	me: async function (
-		req: Request<object, User, object, object, AuthenticatedUser>,
-		res: Response<User, AuthenticatedUser>,
+		req,
+		res,
 		next,
 	) {
 		try {
 			const me = await UserService.me({ userId: res.locals.userId });
-			res.status(201).json(me);
+			const meFull: UserPowered = {...me, avatarPath: null}
+			if (me.currentAvatarId) {
+				const avatar = await UserService.getAvatarById(me.currentAvatarId)
+				meFull.avatarPath = avatar
+			}
+			res.status(201).json(meFull);
 		} catch (error) {
 			next(error);
 		}
 	},
 	modify: async function (
-		req: Request<object, User, object, object, AuthenticatedUser>,
-		res: Response<User, AuthenticatedUser>,
+		req,
+		res,
 		next,
 	) {
 		try {
             // if (req.bn)
-			const u = await UserService.modify( res.locals.userId, req.body);
-			res.status(201).json(u);
+			console.log("why no")
+			const u = await UserService.modify( res.locals.userId, req.body, req.file?.filename);
+			const meFull: UserPowered = {...u, avatarPath: null}
+			if (u.currentAvatarId) {
+				const avatar = await UserService.getAvatarById(u.currentAvatarId)
+				meFull.avatarPath = avatar
+			}
+			console.log("OPA")
+			console.log(meFull)
+			console.log("Im good lol")
+			res.status(200).json(meFull);
 		} catch (error) {
 			next(error);
 		}
@@ -70,6 +82,14 @@ export const UserController: UserControllerContract = {
             console.log("TRYING TO VERIFY", req.body.code)
 			const u = await UserService.verify(res.locals.userId, String(req.body.code))
 			res.status(201).json({"success": u});
+		} catch (error) {
+			next(error);
+		}
+	},
+	async getAvatar(req, res, next) {
+		try {
+			const im = await UserService.getAvatarById(+req.params.id)
+            res.status(200).json({avatar: im})
 		} catch (error) {
 			next(error);
 		}

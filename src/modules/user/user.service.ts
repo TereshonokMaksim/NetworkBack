@@ -4,13 +4,14 @@ import {
 	AuthError,
 	InternalServerError,
 	NotFoundError,
-} from "../errors/standartError";
+} from "../../errors/standartError";
 import { UserServiceContract } from "./types/user.contracts";
 import { UserRepository } from "./user.repository";
 import { sign } from "jsonwebtoken";
-import { ENV } from "../config/env";
-import { ALL_VERIFICATION_ATTEMPTS } from "../config/verification";
-import { transporter } from "../config/mail";
+import { ENV } from "../../config/env";
+import { ALL_VERIFICATION_ATTEMPTS } from "../../config/verification";
+import { transporter } from "../../config/mail";
+import { AlbumRepository } from "./@x";
 
 
 export const UserService: UserServiceContract = {
@@ -55,6 +56,8 @@ export const UserService: UserServiceContract = {
             text: `Hello, this email is about finishing creating your account. Here is the code: ${code}`
         });
 
+		AlbumRepository.createAlbum("Мої фото", 0, createdUser.id, 0, true)
+
 		return { token };
 	},
 	async me(dto) {
@@ -64,12 +67,20 @@ export const UserService: UserServiceContract = {
 		}
 		return user;
 	},
-    async modify(userId, newData){
+    async modify(userId, newData, filename){
         const user = await UserRepository.findById(userId)
         if (!user){
 			throw new NotFoundError("User");
         }
-        return await UserRepository.modify(userId, newData)
+		if (filename){
+			console.log("Takoe sebe")
+			const image = await UserRepository.createImage(filename)
+			const avatar = await UserRepository.createAvatar(userId, image.id)
+			await UserRepository.modify(userId, {currentAvatarId: avatar.id})
+			const myAlbum = await AlbumRepository.getUserPersonalAlbum(userId)
+			await AlbumRepository.createAlbumImageByImage(image, myAlbum.id)
+		}
+        return await UserRepository.modify(userId, {...newData})
     },
     async verify(userId, verificationCode){
         console.log(`FULL LOG: \n\tCODE: ${verificationCode}\n\tID: ${userId}\n\tCODES: `)
@@ -85,5 +96,16 @@ export const UserService: UserServiceContract = {
             return true
         }
         return false
-    }
+    },
+	async getAvatarById(avatarId) {
+		const avatar = await UserRepository.getAvatarById(avatarId)
+		if (!avatar){
+			throw new NotFoundError("Avatar")
+		}
+		const image = await UserRepository.getImageById(avatar.imageId)
+		if (!image){
+			throw new NotFoundError("Image")
+		}
+		return image.originalImagePath
+	},
 };

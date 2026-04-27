@@ -7,14 +7,21 @@ import sharp from "sharp";
 
 
 export const uploadMiddleware = multer({ storage: memoryStorage() });
-export function processImageMiddleware(width: number, quality: number = 80) {
+export function processImageMiddleware(width: number, quality: number = 80, required: boolean = false) {
 	return async function (req: Request, res: Response, next: NextFunction) {
 		try {
 			const file = req.file;
 			if (!file) {
-				next(new BadReqError("No uploaded image!"));
+				console.log("NO image found")
+				if (required){
+					next(new BadReqError("No uploaded image!"));
+				}
+				else {
+					next()
+				}
 				return;
 			}
+			console.log("image found")
 			const filename = `${Date.now()}.jpeg`;
 			const originalFilePath = join(originalFilesDir, filename);
 			const thumbnailFilePath = join(thumbnailFilesDir, filename);

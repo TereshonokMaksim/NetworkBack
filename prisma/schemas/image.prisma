@@ -1,8 +1,10 @@
 model Image {
-  id                  Int      @id @default(autoincrement())
+  id                  Int          @id @default(autoincrement())
   originalImagePath   String
-  compressedImagePath String
-  createdAt           DateTime @default(now())
-  avatar              Avatar?  @relation(name: "userImage")
-  signature           User?    @relation(name: "signatureImage")
+  compressedImagePath String?
+  createdAt           DateTime     @default(now())
+  avatar              Avatar?      @relation(name: "userImage")
+  signature           User?        @relation(name: "signatureImage")
+  albums              Album[]
+  albumImages         AlbumImage[]
 }
