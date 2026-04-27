@@ -6,6 +6,7 @@ model User {
   username         String?
   password         String
   email            String
+  birthday         String?
   currentAvatar    Avatar?  @relation(fields: [currentAvatarId], references: [id], name: "currentUserAvatar")
   currentAvatarId  Int?     @unique
   avatars          Avatar[] @relation(name: "userAvatar")
@@ -17,4 +18,5 @@ model User {
   verified         Boolean  @default(false)
   createdAt        DateTime @default(now())
   isAdmin          Boolean  @default(false)
+  albums           Album[]
 }

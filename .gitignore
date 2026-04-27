@@ -7,3 +7,6 @@ node_modules
 /src/generated
 
 package-lock.json
+
+media/original/*
+media/thumbnail/*

@@ -6,9 +6,12 @@ import type {
     User,
     UserCreateInput,
     UserWithPassword,
-    UserModify
+    UserModify,
+    Image,
+    Avatar,
+    UserPowered
 } from "./user.types";
-import { AuthenticatedUser } from "../../types/standartTypes";
+import { AuthenticatedUser } from "../../../types/standartTypes";
 
 export interface UserServiceContract {
     login: (credentials: LoginCredentials) => Promise<{ token: string }>;
@@ -16,8 +19,9 @@ export interface UserServiceContract {
         credentials: RegisterCredentials
     ) => Promise<{ token: string }>;
     me: (dto: MeDTO) => Promise<User>;
-    modify: (userId: number, newData: UserModify) => Promise<User>
+    modify: (userId: number, newData: UserModify, filename?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
+    getAvatarById: (avatarId: number) => Promise<string>
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -27,6 +31,10 @@ export interface UserRepositoryContract {
     create: (data: UserCreateInput) => Promise<User>;
     findById: (id: number) => Promise<User>;
     modify: (userId: number, newData: UserModify) => Promise<User>;
+    createAvatar: (userId: number, imageId: number) => Promise<Avatar>
+    createImage: (originalImagePath: string) => Promise<Image>
+    getImageById: (imageId: number) => Promise<Image>
+    getAvatarById: (avatarId: number) => Promise<Avatar>
 }
 
 export interface UserControllerContract {
@@ -41,13 +49,13 @@ export interface UserControllerContract {
 		next: NextFunction
     ) => void;
     me: (
-        req: Request<object, User, object, object, AuthenticatedUser>,
-        res: Response<User, AuthenticatedUser>,
+        req: Request<object, UserPowered, object, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
 		next: NextFunction
     ) => void;
     modify: (
-        req: Request<object, User, UserModify, object, AuthenticatedUser>,
-        res: Response<User, AuthenticatedUser>,
+        req: Request<object, UserPowered, UserModify, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
 		next: NextFunction
     ) => void;
     verify: (
@@ -55,4 +63,9 @@ export interface UserControllerContract {
         res: Response<{success: boolean}, AuthenticatedUser>,
 		next: NextFunction
     ) => void;
+    getAvatar: (
+        req: Request<{id: string}, {avatar: string}, object, AuthenticatedUser>,
+        res: Response<{avatar: string}, AuthenticatedUser>,
+		next: NextFunction
+    ) => void
 }

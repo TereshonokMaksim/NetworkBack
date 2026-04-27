@@ -27,7 +27,7 @@ export function authenticateMiddleware(
 			return;
 		}
 		res.locals.userId = (userData as TokenPayload).id;
-		console.log(res.locals.userId, "asd")
+		console.log(res.locals.userId, "userId, authentication")
 		next();
 	} catch (error) {
 		if (error instanceof TokenExpiredError) {

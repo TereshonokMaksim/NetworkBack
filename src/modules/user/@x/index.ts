@@ -1,0 +1,1 @@
+export { AlbumRepository } from "../../album/album.repository"

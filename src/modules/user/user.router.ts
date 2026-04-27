@@ -6,7 +6,8 @@ import { UserController } from "./user.controller";
 // 	processImageMiddleware,
 // 	uploadMiddleware,
 // } from "../../middlewares/upload.middleware";
-import { authenticateMiddleware } from "../middlewares/auth.middleware";
+import { authenticateMiddleware } from "../../middlewares/auth.middleware";
+import { uploadMiddleware, processImageMiddleware } from "../../middlewares/media.middleware";
 
 export const UserRoutes = Router();
 
@@ -35,7 +36,11 @@ UserRoutes.patch(
 	"/me",
     authenticateMiddleware,
 	// validateMiddleware(regSchema),
-	// uploadMiddleware.single("avatar"),
-	// processImageMiddleware(200, 80),
+	uploadMiddleware.single("avatar"),
+	processImageMiddleware(200, 80),
 	UserController.modify,
 );
+UserRoutes.get(
+	"/avatar/:id",
+	UserController.getAvatar
+)
