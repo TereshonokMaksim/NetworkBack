@@ -19,7 +19,7 @@ export interface UserServiceContract {
         credentials: RegisterCredentials
     ) => Promise<{ token: string }>;
     me: (dto: MeDTO) => Promise<User>;
-    modify: (userId: number, newData: UserModify, filename?: string) => Promise<User>
+    modify: (userId: number, newData: UserModify, originalImagePath?: string, compressedImagePath?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
     getAvatarById: (avatarId: number) => Promise<string>
 }
@@ -32,7 +32,7 @@ export interface UserRepositoryContract {
     findById: (id: number) => Promise<User>;
     modify: (userId: number, newData: UserModify) => Promise<User>;
     createAvatar: (userId: number, imageId: number) => Promise<Avatar>
-    createImage: (originalImagePath: string) => Promise<Image>
+    createImage: (originalImagePath: string, compressedImagePath: string) => Promise<Image>
     getImageById: (imageId: number) => Promise<Image>
     getAvatarById: (avatarId: number) => Promise<Avatar>
 }

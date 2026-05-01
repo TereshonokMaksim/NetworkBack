@@ -7,4 +7,6 @@ model Image {
   signature           User?        @relation(name: "signatureImage")
   albums              Album[]
   albumImages         AlbumImage[]
+  postOriginal        Post?        @relation(fields: [postOriginalId], references: [id], name: "postImage")
+  postOriginalId      Int?
 }

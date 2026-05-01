@@ -20,7 +20,7 @@ export type AlbumRepositoryContract = {
     getAlbumsByUserId: (userId: number) => Promise<Album[]>
     deleteAlbum: (albumId: number) => Promise<Album>
 
-    createAlbumImage: (originalImagePath: string, albumId: number) => Promise<AlbumImageForShow>
+    createAlbumImage: (originalImagePath: string, compressedImagePath: string, albumId: number) => Promise<AlbumImageForShow>
     createAlbumImageByImage: (image: Image, albumId: number) => Promise<AlbumImage>
     editAlbumImage: (imageId: number, newData: AlbumImageEdit) => Promise<AlbumImage>
     getAlbumImageById: (imageId: number) => Promise<AlbumImage | null>
@@ -39,7 +39,7 @@ export type AlbumServiceContract = {
     getAlbumsByUserId: (userId: number) => Promise<Album[]>
     deleteAlbum: (albumId: number) => Promise<Album>
     
-    createAlbumImage: (originalImagePath: string, albumId: number) => Promise<AlbumImageForShow>
+    createAlbumImage: (originalImagePath: string, compressedImagePath: string, albumId: number) => Promise<AlbumImageForShow>
     editAlbumImage: (imageId: number, newImageData: AlbumImageEdit) => Promise<AlbumImage>
     getAlbumImageByAlbumId: (albumId: number) => Promise<AlbumImageForShow[]>
     deleteAlbumImage: (imageId: number) => Promise<AlbumImage>

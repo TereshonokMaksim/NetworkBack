@@ -41,7 +41,7 @@ export const AlbumController: AlbumControllerContract = {
                 res.status(400).json()
                 return
             }
-            res.status(200).json(await AlbumService.createAlbumImage(req.file?.filename, +req.params.albumId))
+            res.status(200).json(await AlbumService.createAlbumImage(req.file.originalname, req.file.filename, +req.params.albumId))
         } catch (error) {
 			next(error);
 		}

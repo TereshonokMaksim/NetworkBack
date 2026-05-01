@@ -53,9 +53,9 @@ export const AlbumRepository: AlbumRepositoryContract = {
         }
     },
 
-    async createAlbumImage(originalImagePath, albumId) {
+    async createAlbumImage(originalImagePath, compressedImagePath, albumId) {
         try {
-            const im = await PrismaClient.image.create({data: {originalImagePath: originalImagePath}})
+            const im = await PrismaClient.image.create({data: {originalImagePath: originalImagePath, compressedImagePath}})
             const aim = await PrismaClient.albumImage.create({data: {imageId: im.id, albumId}})
             return {id: aim.id, albumId: aim.albumId, shown: aim.shown, originalImagePath: im.originalImagePath}
         }
