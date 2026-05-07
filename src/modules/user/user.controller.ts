@@ -94,4 +94,23 @@ export const UserController: UserControllerContract = {
 			next(error);
 		}
 	},
-};
+	async toggleSignature(req, res, next) {
+    	try {
+        	const { showSignature } = req.body;
+        	// Используем UserService напрямую, если он импортирован как объект/экземпляр
+        	const result = await UserService.toggleSignature(res.locals.userId, showSignature, next);
+        	res.status(200).json(result);
+    	} catch (error) {
+        	next(error);
+    	}
+},
+
+	async saveSignatureImage(req, res, next) {
+    	try {
+        	const { imageId } = req.body;
+        	const result = await UserService.saveSignatureImage(res.locals.userId, +imageId, next);
+        	res.status(200).json(result);
+    	} catch (error) {
+        	next(error);
+    	}
+}

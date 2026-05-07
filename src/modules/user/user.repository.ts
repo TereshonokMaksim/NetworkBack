@@ -118,5 +118,15 @@ export const UserRepository: UserRepositoryContract = {
 			throw new InternalServerError("huh")
 		}
 	},
+	async updateSignature(userId: number, data: { signatureImageId?: number; showSignature?: boolean }) {
+  		return await PrismaClient.user.update({
+    		where: { id: userId },
+    	data: 
+		{
+      	signatureImageId: data.signatureImageId,
+      	showSignature: data.showSignature,
+    	},
+  });
+}
 	
 };
