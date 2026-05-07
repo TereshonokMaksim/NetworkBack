@@ -18,5 +18,8 @@ AlbumRoutes.post(
 	processImageMiddleware(200, 70),
     AlbumController.createAlbumImage)
 AlbumRoutes.patch("/:albumId/images/:imageId", authenticateMiddleware, AlbumController.editAlbumImage)
-AlbumRoutes.get("/:albumId/images", AlbumController.getAlbumImagesByAlbum)
+AlbumRoutes.get("/:albumId/images", authenticateMiddleware, AlbumController.getAlbumImagesByAlbum)
 AlbumRoutes.delete("/:albumId/images/:imageId", authenticateMiddleware, AlbumController.deleteAlbumImage)
+
+AlbumRoutes.get("/tags", AlbumController.getAllTags)
+AlbumRoutes.get("/tags/:id", AlbumController.getTagById)

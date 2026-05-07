@@ -16,8 +16,8 @@ export const AlbumService: AlbumServiceContract = {
         return AlbumRepository.deleteAlbum(albumId)
     },
 
-    async createAlbumImage(originalImagePath, compressedImagePath, albumId) {
-        return AlbumRepository.createAlbumImage(originalImagePath, compressedImagePath, albumId)
+    async createAlbumImage(originalImagePath, albumId) {
+        return AlbumRepository.createAlbumImage(originalImagePath, albumId)
     },
     async editAlbumImage(imageId, newImageData) {
         return AlbumRepository.editAlbumImage(imageId, newImageData)
@@ -27,5 +27,12 @@ export const AlbumService: AlbumServiceContract = {
     },
     async deleteAlbumImage(imageId) {
         return AlbumRepository.deleteAlbumImage(imageId)
-    }
+    },
+
+    async getAllTags() {
+        return AlbumRepository.getAllTags()
+    },
+    async getTagById(tagId) {
+        return AlbumRepository.getTagById(tagId)
+    },
 }

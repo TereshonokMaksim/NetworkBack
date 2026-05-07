@@ -3,5 +3,4 @@ model Tag {
   name      String
   createdAt DateTime @default(now())
   albums    Album[]
-  posts     PostTag[]
 }

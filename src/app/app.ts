@@ -2,10 +2,8 @@ import express, {Request, Response} from "express"
 import cors from "cors"
 import { ENV } from "../config/env"
 import { UserRoutes } from "../modules/user/user.router"
-import { uploadDir } from "../config/path"
+import { originalFilesDir } from "../config/path"
 import { AlbumRoutes } from "../modules/album/album.router"
-import { PostRoutes } from "../modules/post/post.router"
-import { TagRoutes } from "../modules/tag/tag.router"
 
 
 const app = express()
@@ -18,9 +16,7 @@ app.use(cors())
 // }
 app.use("/users/", UserRoutes)
 app.use("/albums/", AlbumRoutes)
-app.use("/posts/", PostRoutes)
-app.use("/tags/", TagRoutes)
-app.use("/media/", express.static(uploadDir));
+app.use("/media/", express.static(originalFilesDir));
 
 app.get("/", (req: Request, res: Response) => {res.status(200).json({status: "OK", timestamp: Date.now()})})
 setInterval(() => {

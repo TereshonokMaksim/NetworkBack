@@ -41,7 +41,7 @@ export const AlbumController: AlbumControllerContract = {
                 res.status(400).json()
                 return
             }
-            res.status(200).json(await AlbumService.createAlbumImage(req.file.originalname, req.file.filename, +req.params.albumId))
+            res.status(200).json(await AlbumService.createAlbumImage(req.file?.filename, +req.params.albumId))
         } catch (error) {
 			next(error);
 		}
@@ -66,5 +66,23 @@ export const AlbumController: AlbumControllerContract = {
         } catch (error) {
 			next(error);
 	    }
-    }
+    },
+    
+    async getAllTags(req, res, next) {
+        try {
+            const data = await AlbumService.getAllTags()
+            console.log("Processing....")
+            console.log(data)
+            res.status(200).json(data)
+        } catch (error) {
+			next(error);
+		}
+    },
+    async getTagById(req, res, next) {
+        try {
+            res.status(200).json(await AlbumService.getTagById(+req.params.id))
+        } catch (error) {
+			next(error);
+		}
+    },
 }

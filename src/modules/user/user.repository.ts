@@ -74,11 +74,11 @@ export const UserRepository: UserRepositoryContract = {
 			throw new InternalServerError("huh")
 		}
 	},
-	async createImage(originalImagePath, compressedImagePath) {
+	async createImage(originalImagePath) {
 		try {
             // Unsure if error handling will work without await
 			return await PrismaClient.image.create({
-				data: {originalImagePath, compressedImagePath}
+				data: {originalImagePath}
 			});
 		} catch (error) {
 			HandleDBError(error)

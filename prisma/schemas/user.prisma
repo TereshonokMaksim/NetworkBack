@@ -7,18 +7,16 @@ model User {
   password         String
   email            String
   birthday         String?
-  currentAvatar    Avatar?          @relation(fields: [currentAvatarId], references: [id], name: "currentUserAvatar")
-  currentAvatarId  Int?             @unique
-  avatars          Avatar[]         @relation(name: "userAvatar")
-  showNickname     Boolean          @default(false)
-  signature        Image?           @relation(fields: [signatureImageId], references: [id], name: "signatureImage")
-  signatureImageId Int?             @unique
-  showSignature    Boolean          @default(false)
-  online           Boolean          @default(false)
-  verified         Boolean          @default(false)
-  createdAt        DateTime         @default(now())
-  isAdmin          Boolean          @default(false)
+  currentAvatar    Avatar?  @relation(fields: [currentAvatarId], references: [id], name: "currentUserAvatar")
+  currentAvatarId  Int?     @unique
+  avatars          Avatar[] @relation(name: "userAvatar")
+  showNickname     Boolean  @default(false)
+  signature        Image?   @relation(fields: [signatureImageId], references: [id], name: "signatureImage")
+  signatureImageId Int?     @unique
+  showSignature    Boolean  @default(false)
+  online           Boolean  @default(false)
+  verified         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  isAdmin          Boolean  @default(false)
   albums           Album[]
-  posts            Post[]           @relation(name: "userPost")
-  userPostStatuses UserPostStatus[]
 }

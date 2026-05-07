@@ -1,17 +1,16 @@
 model Album {
-  id             Int          @id @default(autoincrement())
-  name           String
-  user           User         @relation(fields: [userId], references: [id])
-  userId         Int
-  previewImage   Image?       @relation(fields: [previewImageId], references: [id])
-  previewImageId Int?
-  shown          Boolean      @default(true)
-  tag            Tag          @relation(fields: [tagId], references: [id])
-  tagId          Int
-  createdAt      DateTime     @default(now())
-  images         AlbumImage[]
-  year           Int
-  avatarOnly     Boolean      @default(false)
-
-  @@unique([userId, name])
+    id             Int          @id @default(autoincrement())
+    name           String
+    user           User         @relation(fields: [userId], references: [id])
+    userId         Int
+    previewImage   Image?       @relation(fields: [previewImageId], references: [id])
+    previewImageId Int?
+    shown          Boolean      @default(true)
+    tag            Tag          @relation(fields: [tagId], references: [id])
+    tagId          Int
+    createdAt      DateTime     @default(now())
+    images         AlbumImage[]
+    year Int
+    avatarOnly Boolean @default(false)
+    @@unique([userId, name])
 }

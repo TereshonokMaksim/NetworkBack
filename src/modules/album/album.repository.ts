@@ -53,9 +53,9 @@ export const AlbumRepository: AlbumRepositoryContract = {
         }
     },
 
-    async createAlbumImage(originalImagePath, compressedImagePath, albumId) {
+    async createAlbumImage(originalImagePath, albumId) {
         try {
-            const im = await PrismaClient.image.create({data: {originalImagePath: originalImagePath, compressedImagePath}})
+            const im = await PrismaClient.image.create({data: {originalImagePath: originalImagePath}})
             const aim = await PrismaClient.albumImage.create({data: {imageId: im.id, albumId}})
             return {id: aim.id, albumId: aim.albumId, shown: aim.shown, originalImagePath: im.originalImagePath}
         }
@@ -106,6 +106,25 @@ export const AlbumRepository: AlbumRepositoryContract = {
     async deleteAlbumImage(imageId) {
         try {
             return PrismaClient.albumImage.delete({where: {id: imageId}})
+        }
+        catch (error){
+            HandleDBError(error)
+            throw new InternalServerError("huh")
+        }
+    },
+
+    getAllTags() {
+        try {
+            return PrismaClient.tag.findMany()
+        }
+        catch (error){
+            HandleDBError(error)
+            throw new InternalServerError("huh")
+        }
+    },
+    async getTagById(tagId) {
+        try {
+            return PrismaClient.tag.findUnique({where: {id: tagId}})
         }
         catch (error){
             HandleDBError(error)
