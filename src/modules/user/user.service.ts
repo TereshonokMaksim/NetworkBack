@@ -108,4 +108,18 @@ export const UserService: UserServiceContract = {
 		}
 		return image.originalImagePath
 	},
+	async updateSignatureSettings(userId: number, showSignature: boolean) {
+  		return await UserRepository.updateSignature(userId, { showSignature });
+	},
+
+	async saveSignatureImage(userId: number, imageId: number) {
+
+  		return await UserRepository.updateSignature(userId, { 
+    	signatureImageId: imageId, 
+    	showSignature: true 
+  		});
+	},
+	async toggleSignature(userId: number, showSignature: boolean) {
+  		return await UserRepository.updateSignature(userId, { showSignature });
+	},
 };

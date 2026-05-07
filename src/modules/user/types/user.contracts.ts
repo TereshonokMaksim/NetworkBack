@@ -22,6 +22,21 @@ export interface UserServiceContract {
     modify: (userId: number, newData: UserModify, filename?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
     getAvatarById: (avatarId: number) => Promise<string>
+       updateSignatureSettings: (
+        req: Request<object, UserPowered, {showSignature: boolean}, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
+        next: NextFunction
+    ) => void;
+        saveSignatureImage: (
+        req: Request<object, UserPowered, {imageId: number}, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
+        next: NextFunction
+    ) => void;
+        toggleSignature: (
+        req: Request<object, UserPowered, {showSignature: boolean}, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
+        next: NextFunction
+    ) => void;
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -35,6 +50,10 @@ export interface UserRepositoryContract {
     createImage: (originalImagePath: string) => Promise<Image>
     getImageById: (imageId: number) => Promise<Image>
     getAvatarById: (avatarId: number) => Promise<Avatar>
+    updateSignature: (
+        userId: number,
+        signatureData: { showSignature: boolean; signatureImageId?: number }
+    ) => Promise<User>;
 }
 
 export interface UserControllerContract {
@@ -67,5 +86,15 @@ export interface UserControllerContract {
         req: Request<{id: string}, {avatar: string}, object, AuthenticatedUser>,
         res: Response<{avatar: string}, AuthenticatedUser>,
 		next: NextFunction
-    ) => void
+    ) => void;
+    toggleSignature: (
+        req: Request<object, UserPowered, {showSignature: boolean}, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
+        next: NextFunction
+    ) => void;
+    saveSignatureImage: (
+        req: Request<object, UserPowered, {imageId: number}, object, AuthenticatedUser>,
+        res: Response<UserPowered, AuthenticatedUser>,
+        next: NextFunction
+    ) => void;
 }
