@@ -1,0 +1,10 @@
+model UserPostStatus {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  post      Post     @relation(fields: [postId], references: [id], name: "postStatus")
+  postId    Int
+  liked     Boolean  @default(false)
+  hearted   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
