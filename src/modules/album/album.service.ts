@@ -27,12 +27,5 @@ export const AlbumService: AlbumServiceContract = {
     },
     async deleteAlbumImage(imageId) {
         return AlbumRepository.deleteAlbumImage(imageId)
-    },
-
-    async getAllTags() {
-        return AlbumRepository.getAllTags()
-    },
-    async getTagById(tagId) {
-        return AlbumRepository.getTagById(tagId)
-    },
+    }
 }

@@ -21,7 +21,7 @@ export type PostUpdate = Partial<Prisma.PostGetPayload<{
         };
     }>>
 
-export type PostCreateDto = Omit<PostCreate, "authorId"> & {tagIds: number[]} & {links: string[]}
+export type PostCreateDto = Omit<PostCreate, "authorId"> & {tagIds: string} & {links: string}
 export type PostUpdateDto = Omit<Partial<PostCreate>, "authorId">
 
 export type PostImage = Prisma.ImageGetPayload<{omit: {createdAt: true}}>
@@ -30,8 +30,7 @@ export type PostImageDto = {
     compressedImagePath: string;
 }
 export type PostToShowExtract = Prisma.PostGetPayload<{omit: {updatedAt: true, createdAt: true}}>
-export type PostToShow = PostToShowExtract & {images: PostImage[], tags: PostTag[], links: string[]}
+export type PostToShow = PostToShowExtract & {images: PostImage[], tags: PostTag[], links: string[], authorUsername: string, authorAvatarPath: string | null}
 export type PostTag = Prisma.TagGetPayload<{omit: {createdAt: true}}>
 
 export type PostLink = Prisma.PostLinkGetPayload<{}>
-export type Tag = Prisma.TagGetPayload<{omit: {createdAt: true}}>

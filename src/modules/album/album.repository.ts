@@ -113,25 +113,6 @@ export const AlbumRepository: AlbumRepositoryContract = {
         }
     },
 
-    getAllTags() {
-        try {
-            return PrismaClient.tag.findMany()
-        }
-        catch (error){
-            HandleDBError(error)
-            throw new InternalServerError("huh")
-        }
-    },
-    async getTagById(tagId) {
-        try {
-            return PrismaClient.tag.findUnique({where: {id: tagId}})
-        }
-        catch (error){
-            HandleDBError(error)
-            throw new InternalServerError("huh")
-        }
-    },
-
     async getUserPersonalAlbum(userId) {
         try {
             return PrismaClient.album.findFirstOrThrow({where: {userId, name: "Мої фото"}})

@@ -66,23 +66,5 @@ export const AlbumController: AlbumControllerContract = {
         } catch (error) {
 			next(error);
 	    }
-    },
-    
-    async getAllTags(req, res, next) {
-        try {
-            const data = await AlbumService.getAllTags()
-            console.log("Processing....")
-            console.log(data)
-            res.status(200).json(data)
-        } catch (error) {
-			next(error);
-		}
-    },
-    async getTagById(req, res, next) {
-        try {
-            res.status(200).json(await AlbumService.getTagById(+req.params.id))
-        } catch (error) {
-			next(error);
-		}
-    },
+    }
 }

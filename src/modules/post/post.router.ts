@@ -14,15 +14,11 @@ PostRoutes.post(
     PostController.createPost
 );
 PostRoutes.get(
-    "/:pageNumber",
-    PostController.getAllPosts
-);
-PostRoutes.get(
     "/mine",
     authenticateMiddleware,
     PostController.getUserPosts
 )
 PostRoutes.get(
-    "/tags",
-    PostController.getAllTags
-)
+    "/:pageNumber",
+    PostController.getAllPosts
+);

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { originalFilesDir, thumbnailFilesDir } from "../config/path";
 import sharp from "sharp";
 
-async function saveImage(file: Express.Multer.File, filename: string, quality: number, width: number, additionalFolder: string | null) {
+async function saveImage(file: Express.Multer.File, filename: string, quality: number, width: number, additionalFolder: string | null, res: Response) {
     let filenameFull = `${filename}.jpeg`;
 	if (additionalFolder){
 		filenameFull = join(additionalFolder, filenameFull)
@@ -16,8 +16,6 @@ async function saveImage(file: Express.Multer.File, filename: string, quality: n
     await sharp(file.buffer).jpeg({ quality: 100 }).toFile(originalFilePath);
     await sharp(file.buffer).jpeg({ quality }).resize({ width }).toFile(thumbnailFilePath);
 
-    file.filename = `thumbnail/${filenameFull}`;
-    file.originalname = `original/${filenameFull}`;
 }
 
 export const uploadMiddleware = multer({ storage: memoryStorage() });
@@ -59,14 +57,26 @@ export function processImageMiddleware(
                     return;
                 }
                 console.log("image found");
-                saveImage(file, `${Date.now()}`, quality, width, additionalFolder);
+                saveImage(file, `${Date.now()}`, quality, width, additionalFolder, res);
             }
 			else {
+                res.locals.files = []
 				let counter=0;
 				let nameStart=Date.now()
 				for (let file of files){
 					counter++
-					saveImage(file, `${nameStart}---${counter}`, quality, width, additionalFolder)
+					saveImage(file, `${nameStart}---${counter}`, quality, width, additionalFolder, res)
+					const a = {filename: "", originalname: ""}
+					if (additionalFolder){
+						a.filename = `thumbnail/${additionalFolder}/${nameStart}---${counter}.jpeg`;
+						a.originalname = `original/${additionalFolder}/${nameStart}---${counter}.jpeg`;
+					}
+					else {
+						a.filename = `thumbnail/${nameStart}---${counter}.jpeg`;
+						a.originalname = `original/${nameStart}---${counter}.jpeg`;
+					}
+					console.log("FILES", a)
+                    res.locals.files.push(a)
 				}
 			}
 

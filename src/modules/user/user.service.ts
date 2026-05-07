@@ -74,7 +74,7 @@ export const UserService: UserServiceContract = {
         }
 		if (filename){
 			console.log("Takoe sebe")
-			const image = await UserRepository.createImage(filename)
+			const image = await UserRepository.createImage(filename, filename)
 			const avatar = await UserRepository.createAvatar(userId, image.id)
 			await UserRepository.modify(userId, {currentAvatarId: avatar.id})
 			const myAlbum = await AlbumRepository.getUserPersonalAlbum(userId)

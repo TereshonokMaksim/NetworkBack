@@ -28,10 +28,11 @@ export const PostRepository: PostRepositoryContract = {
     },
     async createPostTag(postId, tagId) {
         try {
+            console.log("CREATING POSTTAG: ", postId, tagId)
             const tag = await PrismaClient.postTag.create({
                 data: {
                     postId: postId,
-                    tagId: tagId,
+                    tagId: +tagId,
                 },
                 select: {
                     tag: {
@@ -103,25 +104,18 @@ export const PostRepository: PostRepositoryContract = {
     },
     async getAllPosts(skip, take) {
         try {
-            const posts = await PrismaClient.post.findMany({ skip, take });
+            console.log(skip, take)
+            const posts = await PrismaClient.post.findMany({ skip, take, orderBy: {id: "desc"} });
             return posts;
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
         }
     },
-    async getUserPosts(userId) {
+    async getUserPosts(userId, skip, take) {
         try {
-            const posts = await PrismaClient.post.findMany({ where: { authorId: userId } });
+            const posts = await PrismaClient.post.findMany({ where: { authorId: userId }, skip, take, orderBy: {id: "desc"} });
             return posts;
-        } catch (error) {
-            HandleDBError(error);
-            throw new InternalServerError("huh");
-        }
-    },
-    async getAllTags() {
-        try {
-            return await PrismaClient.tag.findMany();
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");

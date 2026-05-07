@@ -44,7 +44,5 @@ export type AlbumImageEdit = Partial<
     }>
 >;
 
-export type Tag =
-    Prisma.TagGetPayload<{}>;
 export type Image =
     Prisma.ImageGetPayload<{}>;
