@@ -94,4 +94,10 @@ export const UserController: UserControllerContract = {
 			next(error);
 		}
 	},
+	async removeFriend(req: Request, res: Response) {
+		const { id: targetId } = req.params;
+		const userId = req.user.id;
+		await UserService.unfriend(userId, targetId);
+		res.status(200).json({ message: 'Success' });
+}
 };

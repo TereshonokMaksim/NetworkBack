@@ -22,6 +22,7 @@ export interface UserServiceContract {
     modify: (userId: number, newData: UserModify, filename?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
     getAvatarById: (avatarId: number) => Promise<string>
+    unfriend: (userId: string, targetId: string) => Promise<void>
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -35,6 +36,10 @@ export interface UserRepositoryContract {
     createImage: (originalImagePath: string) => Promise<Image>
     getImageById: (imageId: number) => Promise<Image>
     getAvatarById: (avatarId: number) => Promise<Avatar>
+    removeFriendship: (
+        userId: string,
+        targetId: string
+    ) => Promise<void>
 }
 
 export interface UserControllerContract {
@@ -68,4 +73,8 @@ export interface UserControllerContract {
         res: Response<{avatar: string}, AuthenticatedUser>,
 		next: NextFunction
     ) => void
+    removeFriend: (
+        req: Request<{id: string}, object, object, AuthenticatedUser>,
+        res: Response<object, AuthenticatedUser>
+    ) => void;
 }

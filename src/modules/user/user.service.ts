@@ -108,4 +108,7 @@ export const UserService: UserServiceContract = {
 		}
 		return image.originalImagePath
 	},
+	async unfriend(userId: string, targetId: string) {
+    return await UserRepository.removeFriendship(userId, targetId);
+}
 };
