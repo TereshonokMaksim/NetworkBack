@@ -118,5 +118,15 @@ export const UserRepository: UserRepositoryContract = {
 			throw new InternalServerError("huh")
 		}
 	},
+	async removeFriendship(userId: string, targetId: string) {
+    return await PrismaClient.friendship.deleteMany({
+        where: {
+            OR: [
+                { userId: userId, friendId: targetId },
+                { userId: targetId, friendId: userId }
+            ]
+        }
+    });
+}
 	
 };
