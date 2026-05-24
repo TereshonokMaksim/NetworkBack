@@ -94,4 +94,12 @@ export const UserController: UserControllerContract = {
 			next(error);
 		}
 	},
+	async getProfile(req, res, next) {
+		try {
+			const id = +req.params.id
+            res.status(200).json(await UserService.getProfile(id, res.locals.userId))
+		} catch (error) {
+			next(error);
+		}
+	},
 };

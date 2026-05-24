@@ -1,0 +1,10 @@
+model UserSocial {
+  id           Int    @id @default(autoincrement())
+  firstUser    User   @relation(fields: [firstUserId], references: [id], name: "firstUserRel")
+  firstUserId  Int
+  secondUser   User   @relation(fields: [secondUserId], references: [id], name: "secondUserRel")
+  secondUserId Int
+  status       String // Can be either "friend" or "request"
+
+  @@unique([firstUserId, secondUserId])
+}

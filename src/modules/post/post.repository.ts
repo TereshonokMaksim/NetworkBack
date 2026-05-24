@@ -12,6 +12,24 @@ export const PostRepository: PostRepositoryContract = {
             throw new InternalServerError("huh");
         }
     },
+    async editPost(id, data) {
+        try {
+            return await PrismaClient.post.update({where: {id}, data });
+        } catch (error) {
+            HandleDBError(error);
+            throw new InternalServerError("huh");
+        }
+    },
+    async deletePostImage(postImageId) {
+        try {
+            return await PrismaClient.image.delete({
+                where: {id: postImageId}
+            });
+        } catch (error) {
+            HandleDBError(error);
+            throw new InternalServerError("huh");
+        }
+    },
     async createPostImage(postId, originalPath, compressedPath) {
         try {
             return await PrismaClient.image.create({
@@ -20,6 +38,16 @@ export const PostRepository: PostRepositoryContract = {
                     originalImagePath: originalPath,
                     compressedImagePath: compressedPath,
                 },
+            });
+        } catch (error) {
+            HandleDBError(error);
+            throw new InternalServerError("huh");
+        }
+    },
+    async deletePostTag(tagId, postId) {
+        try {
+            await PrismaClient.postTag.deleteMany({
+                where: {tagId, postId}
             });
         } catch (error) {
             HandleDBError(error);
@@ -41,6 +69,16 @@ export const PostRepository: PostRepositoryContract = {
                 },
             });
             return tag.tag;
+        } catch (error) {
+            HandleDBError(error);
+            throw new InternalServerError("huh");
+        }
+    },
+    async deletePostLink(postLinkId) {
+        try {
+            return await PrismaClient.postLink.delete({
+                where: {id: postLinkId}
+            });
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -121,4 +159,21 @@ export const PostRepository: PostRepositoryContract = {
             throw new InternalServerError("huh");
         }
     },
+    async deletePost(postId) {
+        try {
+            await PrismaClient.postTag.deleteMany({where: {postId}})
+            await PrismaClient.postLink.deleteMany({where: {postId}})
+            await PrismaClient.post.delete({
+                where: {id: postId}
+            });
+        } catch (error) {
+            HandleDBError(error);
+            throw new InternalServerError("huh");
+        }
+    },
+    // async likePost(postId) {
+    //     try {
+
+    //     } catc
+    // },
 };

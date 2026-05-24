@@ -38,3 +38,15 @@ export type RegisterCredentials = {
 export type MeDTO = {
     userId: number
 }
+
+export type Profile = {
+    id: number
+    avatar: string | null | undefined
+    isOnline: boolean
+    username: string
+    pseudonym: string
+    postsTotal: number
+    readers: number
+    friends: number
+    status: string
+}

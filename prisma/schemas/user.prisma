@@ -21,4 +21,6 @@ model User {
   albums           Album[]
   posts            Post[]           @relation(name: "userPost")
   userPostStatuses UserPostStatus[]
+  relationsF       UserSocial[]       @relation(name: "firstUserRel")
+  relationsS       UserSocial[]       @relation(name: "secondUserRel")
 }

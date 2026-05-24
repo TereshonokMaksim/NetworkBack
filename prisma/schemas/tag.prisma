@@ -1,7 +1,7 @@
 model Tag {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   albums    Album[]
   posts     PostTag[]
 }

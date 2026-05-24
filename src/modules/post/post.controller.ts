@@ -31,4 +31,53 @@ export const PostController: PostControllerContract = {
 			next(error);
         }
     },
+    async getSomeonePosts(req, res, next) {
+        try {
+            const page = +req.query.pageNumber
+            const id = +req.query.someoneId
+            res.status(200).json(await PostService.getUserPosts(id, page, POSTS_PER_PAGE))
+        } catch (error) {
+			next(error);
+        }
+    },
+    async editPost(req, res, next) {
+        try {
+            console.log("WHHY")
+            if (!req.params) {
+                res.status(400).json({error: "No id"})
+                return
+            }
+            const id = +req.params.id
+            if (Number.isNaN(id)) {
+                res.status(422).json({error: "Wrong id"})
+                return
+            }
+            let files = res.locals.files;
+            console.log("Body")
+            console.log(req.body)
+            const {tagIds, links, ...body} = req.body
+            console.log(id, body, files, tagIds ? tagIds : "", links ? links : "")
+            const postData = await PostService.editPost(id, body, files, tagIds ? tagIds : "", links ? links : "")
+            res.status(200).json(postData)
+        } catch (error) {
+			next(error);
+        }
+    },
+    async deletePost(req, res, next) {
+        try {
+            if (!req.params) {
+                res.status(400).json({success: false})
+                return
+            }
+            const id = +req.params.id
+            if (Number.isNaN(id)) {
+                res.status(422).json({success: false})
+                return
+            }
+            await PostService.deletePost(id)
+            res.status(200).json({success: true})
+        } catch (error) {
+			next(error);
+        }
+    }
 }

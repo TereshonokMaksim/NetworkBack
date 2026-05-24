@@ -108,4 +108,7 @@ export const UserService: UserServiceContract = {
 		}
 		return image.originalImagePath
 	},
+	async getProfile(userId, myId) {
+		return await UserRepository.getProfile(userId, myId)
+	},
 };

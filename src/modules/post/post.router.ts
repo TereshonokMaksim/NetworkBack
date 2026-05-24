@@ -19,6 +19,23 @@ PostRoutes.get(
     PostController.getUserPosts
 )
 PostRoutes.get(
+    "/someone",
+    authenticateMiddleware,
+    PostController.getSomeonePosts
+)
+PostRoutes.get(
     "/:pageNumber",
     PostController.getAllPosts
+);
+PostRoutes.patch(
+    "/:id",
+    authenticateMiddleware,
+    uploadMiddleware.array("media"),
+    processImageMiddleware(300, 80, false, false, "post"),
+    PostController.editPost
+);
+PostRoutes.delete(
+    "/:id",
+    authenticateMiddleware,
+    PostController.deletePost
 );

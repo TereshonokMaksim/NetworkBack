@@ -44,3 +44,8 @@ UserRoutes.get(
 	"/avatar/:id",
 	UserController.getAvatar
 )
+UserRoutes.get(
+	"/profile/:id",
+	authenticateMiddleware,
+	UserController.getProfile
+)

@@ -8,7 +8,7 @@ model Post {
   likes        Int              @default(0)
   hearted      Int              @default(0)
   watched      Int              @default(0)
-  tags         PostTag[]        
+  tags         PostTag[]
   links        PostLink[]
   images       Image[]          @relation(name: "postImage")
   userStatuses UserPostStatus[] @relation(name: "postStatus")

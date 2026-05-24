@@ -9,7 +9,8 @@ import type {
     UserModify,
     Image,
     Avatar,
-    UserPowered
+    UserPowered,
+    Profile
 } from "./user.types";
 import { AuthenticatedUser } from "../../../types/standartTypes";
 
@@ -22,6 +23,7 @@ export interface UserServiceContract {
     modify: (userId: number, newData: UserModify, originalImagePath?: string, compressedImagePath?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
     getAvatarById: (avatarId: number) => Promise<string>
+    getProfile: (userId: number, myId: number) => Promise<Profile>
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -35,6 +37,7 @@ export interface UserRepositoryContract {
     createImage: (originalImagePath: string, compressedImagePath: string) => Promise<Image>
     getImageById: (imageId: number) => Promise<Image>
     getAvatarById: (avatarId: number) => Promise<Avatar>
+    getProfile: (userId: number, myId: number) => Promise<Profile>
 }
 
 export interface UserControllerContract {
@@ -67,5 +70,10 @@ export interface UserControllerContract {
         req: Request<{id: string}, {avatar: string}, object, AuthenticatedUser>,
         res: Response<{avatar: string}, AuthenticatedUser>,
 		next: NextFunction
+    ) => void
+    getProfile: (
+        req: Request<{id: string}, Profile, object, object, AuthenticatedUser>,
+        res: Response<Profile, AuthenticatedUser>,
+        next: NextFunction
     ) => void
 }

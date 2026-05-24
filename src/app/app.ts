@@ -6,6 +6,7 @@ import { uploadDir } from "../config/path"
 import { AlbumRoutes } from "../modules/album/album.router"
 import { PostRoutes } from "../modules/post/post.router"
 import { TagRoutes } from "../modules/tag/tag.router"
+import { SocialRoutes } from "../modules/social/social.router"
 
 
 const app = express()
@@ -20,12 +21,13 @@ app.use("/users/", UserRoutes)
 app.use("/albums/", AlbumRoutes)
 app.use("/posts/", PostRoutes)
 app.use("/tags/", TagRoutes)
+app.use("/social/", SocialRoutes)
 app.use("/media/", express.static(uploadDir));
 
 app.get("/", (req: Request, res: Response) => {res.status(200).json({status: "OK", timestamp: Date.now()})})
 setInterval(() => {
   console.log('tick', Date.now());
-}, 1000);
+}, 2000);
 app.listen(PORT, HOST, () => {
     console.log(`Server started on http://${HOST}:${PORT}`)
 })

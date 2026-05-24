@@ -84,4 +84,51 @@ export const PostService: PostServiceContract = {
         }
         return cookedPosts
     },
+    async editPost(postId, data, newImages, newTagIds, newLinks) {
+        const images: PostImageDto[] = []
+        if (newImages){
+            for (let file of newImages){
+                images.push({originalImagePath: file.originalname, compressedImagePath: file.filename})
+            }
+        }
+        for (let im of (await PostRepository.getPostImages(postId))){
+            console.log("Processing Image", im)
+            await PostRepository.deletePostImage(im.id)
+        }
+        for (let tag of (await PostRepository.getPostTags(postId))){
+            console.log("Processing Tag", tag)
+            await PostRepository.deletePostTag(tag.id, postId)
+        }
+        for (let link of (await PostRepository.getPostLinks(postId))){
+            console.log("Processing Link", link)
+            await PostRepository.deletePostLink(link.id)
+        }
+        console.log("all deleted!")
+        const post = await PostRepository.editPost(postId, data)
+        const imagesCooked = []
+        const tagsCooked = []
+        const linksCooked = []
+        for (let im of images){
+            imagesCooked.push(await PostRepository.createPostImage(post.id, im.originalImagePath, im.compressedImagePath))
+        }
+        for (let tag of JSON.parse(newTagIds)){
+            tagsCooked.push(await PostRepository.createPostTag(post.id, tag))
+        }
+        for (let l of JSON.parse(newLinks)){
+            linksCooked.push((await PostRepository.createPostLink(post.id, l)).link)
+        }
+        const user = await UserRepository.findById(post.authorId)
+        let avatarPath: null | string = null
+        if (user.currentAvatarId){
+            const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
+            if (avatar){
+                const image = await UserRepository.getImageById(avatar.imageId)!
+                avatarPath = image.compressedImagePath
+            }
+        }
+        return {...post, images: imagesCooked, tags: tagsCooked, links: linksCooked, authorUsername: user.username!, authorAvatarPath: avatarPath}
+    },
+    async deletePost(postId) {
+        return await PostRepository.deletePost(postId)
+    },
 }

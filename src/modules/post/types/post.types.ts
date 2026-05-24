@@ -15,14 +15,18 @@ export type PostCreate =
     }>;
 export type PostUpdate = Partial<Prisma.PostGetPayload<{
         omit: {
+            authorId: true
             id: true;
             updatedAt: true;
             createdAt: true;
+            likes: true;
+            watched: true;
+            hearted: true;
         };
     }>>
 
-export type PostCreateDto = Omit<PostCreate, "authorId"> & {tagIds: string} & {links: string}
-export type PostUpdateDto = Omit<Partial<PostCreate>, "authorId">
+export type PostCreateDto = Omit<PostCreate, "authorId"> & {tagIds: string, links: string}
+export type PostUpdateDto = Omit<Partial<PostCreate>, "authorId"> & {tagIds?: string, links?: string}
 
 export type PostImage = Prisma.ImageGetPayload<{omit: {createdAt: true}}>
 export type PostImageDto = {
