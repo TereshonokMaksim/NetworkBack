@@ -1,0 +1,13 @@
+model Message {
+  id             Int             @id @default(autoincrement())
+  text           String
+  chat           Chat            @relation(fields: [chatId], references: [id])
+  chatId         Int             @map(name: "chat_id")
+  created_at     DateTime        @default(now())
+  sender         User            @relation(fields: [senderId], references: [id], name: "sender_user")
+  senderId       Int             @map(name: "sender_id")
+  messageImages  MessageImage[]
+  messageReaders MessageReader[]
+
+  @@map("chat_app_message")
+}

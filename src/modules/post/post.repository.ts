@@ -6,7 +6,22 @@ import type { PostRepositoryContract } from "./types/post.contracts";
 export const PostRepository: PostRepositoryContract = {
     async createPost(data) {
         try {
-            return await PrismaClient.post.create({ data });
+            const post = await PrismaClient.post.create({ data: {
+                authorId: data.authorId,
+                title: data.title,
+                content: data.text,
+                topic: data.topic
+            } });
+            return {
+                id: post.id,
+                authorId: post.authorId,
+                title: post.title,
+                topic: post.topic,
+                text: post.content,
+                likes: 0,
+                hearted: 0,
+                watched: 0,
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -14,7 +29,21 @@ export const PostRepository: PostRepositoryContract = {
     },
     async editPost(id, data) {
         try {
-            return await PrismaClient.post.update({where: {id}, data });
+            const post = await PrismaClient.post.update({where: {id}, data: {
+                title: data.title,
+                content: data.text,
+                topic: data.topic
+            } });
+            return {
+                id: post.id,
+                authorId: post.authorId,
+                title: post.title,
+                topic: post.topic,
+                text: post.content,
+                likes: 0,
+                hearted: 0,
+                watched: 0,
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -22,9 +51,15 @@ export const PostRepository: PostRepositoryContract = {
     },
     async deletePostImage(postImageId) {
         try {
-            return await PrismaClient.image.delete({
+            const data = await PrismaClient.postImage.delete({
                 where: {id: postImageId}
             });
+            return {
+                compressedImagePath: data.compressed_image,
+                originalImagePath: data.original_image,
+                id: data.id,
+                postOriginalId: data.postId
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -32,13 +67,19 @@ export const PostRepository: PostRepositoryContract = {
     },
     async createPostImage(postId, originalPath, compressedPath) {
         try {
-            return await PrismaClient.image.create({
+            const i = await PrismaClient.postImage.create({
                 data: {
-                    postOriginalId: postId,
-                    originalImagePath: originalPath,
-                    compressedImagePath: compressedPath,
+                    postId: postId,
+                    original_image: originalPath,
+                    compressed_image: compressedPath,
                 },
             });
+            return {
+                id: i.id,
+                originalImagePath: originalPath,
+                compressedImagePath: compressedPath,
+                postOriginalId: postId
+            } 
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -63,9 +104,7 @@ export const PostRepository: PostRepositoryContract = {
                     tagId: +tagId,
                 },
                 select: {
-                    tag: {
-                        omit: { createdAt: true },
-                    },
+                    tag: true
                 },
             });
             return tag.tag;
@@ -101,9 +140,11 @@ export const PostRepository: PostRepositoryContract = {
 
     async getPostImages(postId) {
         try {
-            return await PrismaClient.image.findMany({
-                where: { postOriginalId: postId },
+            const oim = await PrismaClient.postImage.findMany({
+                where: { postId },
             });
+            const fim = oim.map(el => {return {id: el.id, originalImagePath: el.original_image, compressedImagePath: el.compressed_image, postOriginalId: postId}})
+            return fim
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -114,11 +155,7 @@ export const PostRepository: PostRepositoryContract = {
             const tags = await PrismaClient.postTag.findMany({
                 where: { postId },
                 select: {
-                    tag: {
-                        omit: {
-                            createdAt: true,
-                        },
-                    },
+                    tag: true
                 },
             });
             const tagsToThrow = [];
@@ -144,7 +181,17 @@ export const PostRepository: PostRepositoryContract = {
         try {
             console.log(skip, take)
             const posts = await PrismaClient.post.findMany({ skip, take, orderBy: {id: "desc"} });
-            return posts;
+            const cooked = posts.map(post => {return {
+                id: post.id,
+                authorId: post.authorId,
+                title: post.title,
+                topic: post.topic,
+                text: post.content,
+                likes: 0,
+                hearted: 0,
+                watched: 0,
+            }})
+            return cooked;
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -153,7 +200,17 @@ export const PostRepository: PostRepositoryContract = {
     async getUserPosts(userId, skip, take) {
         try {
             const posts = await PrismaClient.post.findMany({ where: { authorId: userId }, skip, take, orderBy: {id: "desc"} });
-            return posts;
+            const cooked = posts.map(post => {return {
+                id: post.id,
+                authorId: post.authorId,
+                title: post.title,
+                topic: post.topic,
+                text: post.content,
+                likes: 0,
+                hearted: 0,
+                watched: 0,
+            }})
+            return cooked;
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -163,6 +220,7 @@ export const PostRepository: PostRepositoryContract = {
         try {
             await PrismaClient.postTag.deleteMany({where: {postId}})
             await PrismaClient.postLink.deleteMany({where: {postId}})
+            await PrismaClient.postImage.deleteMany({where: {postId}})
             await PrismaClient.post.delete({
                 where: {id: postId}
             });

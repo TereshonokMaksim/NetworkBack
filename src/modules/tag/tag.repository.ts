@@ -20,7 +20,7 @@ export const TagRepository: TagRepositoryContract = {
         }
         catch (error) {
             HandleDBError(error)
-            throw new InternalServerError("Uknown error at Tag creation")
+            throw new InternalServerError("Uknown error at Tag getting all")
         }
     },
     async getTagById(id) {
@@ -29,7 +29,7 @@ export const TagRepository: TagRepositoryContract = {
         }
         catch (error) {
             HandleDBError(error)
-            throw new InternalServerError("Uknown error at Tag creation")
+            throw new InternalServerError("Uknown error at Tag getting by id")
         }
     },
 }

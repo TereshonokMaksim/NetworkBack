@@ -4,7 +4,7 @@ import type { AlbumServiceContract } from "./types/album.contracts";
 
 export const AlbumService: AlbumServiceContract = {
     async createAlbum(albumData, userId) {
-        return AlbumRepository.createAlbum(albumData.name, albumData.tagId, userId, albumData.year)
+        return AlbumRepository.createAlbum(albumData.name, albumData.tag, userId, albumData.year)
     },
     async editAlbum(albumId, newAlbumData) {
         return AlbumRepository.editAlbum(albumId, newAlbumData)

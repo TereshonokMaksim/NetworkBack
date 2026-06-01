@@ -1,7 +1,7 @@
 model Tag {
-  id        Int       @id @default(autoincrement())
-  name      String
-  createdAt DateTime  @default(now())
-  albums    Album[]
-  posts     PostTag[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  postTags PostTag[]
+
+  @@map(name: "post_app_tag")
 }

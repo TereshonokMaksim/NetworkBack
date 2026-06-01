@@ -10,6 +10,7 @@ async function saveImage(file: Express.Multer.File, filename: string, quality: n
 	if (additionalFolder){
 		filenameFull = join(additionalFolder, filenameFull)
 	}
+    file.filename = filenameFull
 	const originalFilePath = join(originalFilesDir, filenameFull);
 	const thumbnailFilePath = join(thumbnailFilesDir, filenameFull);
 
@@ -28,38 +29,25 @@ export function processImageMiddleware(
 ) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
-            if (!req.files) {
-                console.log("NOTHING found");
-                if (required) {
-                    next(new BadReqError("No uploaded media!"));
-                } else {
-                    next();
-                }
-                return;
-            }
+            
             let files: Express.Multer.File[] = [];
-            if (Array.isArray(req.files)) {
-                files = req.files;
-            } else {
-                for (let fileMap of Object.values(req.files)) {
-                    files = [...files, ...fileMap];
-                }
-            }
-            if (single) {
-                const file = files[0];
-                if (!file) {
-                    console.log("NO image found");
+            if (!single){
+                if (!req.files) {
+                    console.log("NOTHING found");
                     if (required) {
-                        next(new BadReqError("No uploaded image!"));
+                        next(new BadReqError("No uploaded media!"));
                     } else {
                         next();
                     }
                     return;
                 }
-                console.log("image found");
-                saveImage(file, `${Date.now()}`, quality, width, additionalFolder, res);
-            }
-			else {
+                if (Array.isArray(req.files)) {
+                    files = req.files;
+                } else {
+                    for (let fileMap of Object.values(req.files)) {
+                        files = [...files, ...fileMap];
+                    }
+                }
                 res.locals.files = []
 				let counter=0;
 				let nameStart=Date.now()
@@ -78,7 +66,23 @@ export function processImageMiddleware(
 					console.log("FILES", a)
                     res.locals.files.push(a)
 				}
-			}
+            }
+            else {
+                const file = req.file;
+                if (!file) {
+                    console.log("NO image found");
+                    if (required) {
+                        next(new BadReqError("No uploaded image!"));
+                    } else {
+                        next();
+                    }
+                    return;
+                }
+                // files = [file]
+                req.file = file
+                console.log("image found");
+                saveImage(file, `${Date.now()}`, quality, width, additionalFolder, res);
+            }
 
             next();
         } catch (error) {

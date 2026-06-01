@@ -7,10 +7,8 @@ import type {
     UserCreateInput,
     UserWithPassword,
     UserModify,
-    Image,
-    Avatar,
     UserPowered,
-    Profile
+    ProfileU
 } from "./user.types";
 import { AuthenticatedUser } from "../../../types/standartTypes";
 
@@ -22,8 +20,7 @@ export interface UserServiceContract {
     me: (dto: MeDTO) => Promise<User>;
     modify: (userId: number, newData: UserModify, originalImagePath?: string, compressedImagePath?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
-    getAvatarById: (avatarId: number) => Promise<string>
-    getProfile: (userId: number, myId: number) => Promise<Profile>
+    getProfile: (userId: number, myId: number) => Promise<ProfileU>
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -33,11 +30,8 @@ export interface UserRepositoryContract {
     create: (data: UserCreateInput) => Promise<User>;
     findById: (id: number) => Promise<User>;
     modify: (userId: number, newData: UserModify) => Promise<User>;
-    createAvatar: (userId: number, imageId: number) => Promise<Avatar>
-    createImage: (originalImagePath: string, compressedImagePath: string) => Promise<Image>
-    getImageById: (imageId: number) => Promise<Image>
-    getAvatarById: (avatarId: number) => Promise<Avatar>
-    getProfile: (userId: number, myId: number) => Promise<Profile>
+    createAvatar: (userId: number, image: string) => Promise<void>
+    getProfile: (userId: number, myId: number) => Promise<ProfileU>
 }
 
 export interface UserControllerContract {
@@ -66,14 +60,9 @@ export interface UserControllerContract {
         res: Response<{success: boolean}, AuthenticatedUser>,
 		next: NextFunction
     ) => void;
-    getAvatar: (
-        req: Request<{id: string}, {avatar: string}, object, AuthenticatedUser>,
-        res: Response<{avatar: string}, AuthenticatedUser>,
-		next: NextFunction
-    ) => void
     getProfile: (
-        req: Request<{id: string}, Profile, object, object, AuthenticatedUser>,
-        res: Response<Profile, AuthenticatedUser>,
+        req: Request<{id: string}, ProfileU, object, object, AuthenticatedUser>,
+        res: Response<ProfileU, AuthenticatedUser>,
         next: NextFunction
     ) => void
 }

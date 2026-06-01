@@ -1,6 +1,17 @@
 import { Prisma } from "../../../generated/prisma";
 
-export type User = Prisma.UserGetPayload<{ omit: { password: true } }>;
+export type User = {
+    name: string | null;
+    id: number;
+    surname: string | null;
+    nickname: string | null;
+    username: string | null;
+    email: string;
+    birthday: string | null;
+    online: boolean;
+    verified: boolean;
+    avatar: string | null | undefined
+}
 export type UserPowered = {
     name: string | null;
     id: number;
@@ -9,22 +20,42 @@ export type UserPowered = {
     username: string | null;
     email: string;
     birthday: string | null;
-    currentAvatarId: number | null;
-    showNickname: boolean;
-    signatureImageId: number | null;
-    showSignature: boolean;
     online: boolean;
     verified: boolean;
-    createdAt: Date;
-    isAdmin: boolean;
-    avatarPath: string | null | undefined;
+    avatar: string | null | undefined;
 }
-export type UserModify = Partial<Prisma.UserGetPayload<{omit: {isAdmin: true, createdAt: true, id: true, online: true}}>>
-export type UserWithPassword = Prisma.UserGetPayload<{}>;
-export type UserCreateInput = Prisma.UserUncheckedCreateInput;
+export type UserModify = {
+    name?: string | null | undefined;
+    surname?: string | null | undefined;
+    nickname?: string | null | undefined;
+    username?: string | null | undefined;
+    password?: string | undefined;
+    email?: string | undefined;
+    birthday?: string | null | undefined;
+    currentAvatarId?: number | null | undefined;
+    showNickname?: boolean | undefined;
+    signatureImageId?: number | null | undefined;
+    showSignature?: boolean | undefined;
+    verified?: boolean | undefined;
+}
+export type UserWithPassword = {
+    name: string | null;
+    id: number;
+    surname: string | null;
+    nickname: string | null;
+    username: string | null;
+    password: string;
+    email: string;
+    birthday: string | null;
+    online: boolean;
+    verified: boolean;
+}
+export type UserCreateInput = {
+    password: string,
+    email: string
+};
 
-export type Image = Prisma.ImageGetPayload<{}>
-export type Avatar = Prisma.AvatarGetPayload<{}>
+export type UserRep = Prisma.UserGetPayload<{ omit: { password: true } }>;
 
 // DTO - Data Transfer Object
 export type LoginCredentials = {
@@ -39,7 +70,7 @@ export type MeDTO = {
     userId: number
 }
 
-export type Profile = {
+export type ProfileU = {
     id: number
     avatar: string | null | undefined
     isOnline: boolean
@@ -50,3 +81,4 @@ export type Profile = {
     friends: number
     status: string
 }
+export type ProfileRep = Prisma.ProfileGetPayload<{}>

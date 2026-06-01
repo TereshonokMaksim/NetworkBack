@@ -2,5 +2,7 @@ model PostLink {
   id     Int    @id @default(autoincrement())
   link   String
   post   Post   @relation(fields: [postId], references: [id])
-  postId Int
+  postId Int    @map(name: "post_id")
+
+  @@map(name: "post_app_postlink")
 }

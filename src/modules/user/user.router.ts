@@ -37,13 +37,9 @@ UserRoutes.patch(
     authenticateMiddleware,
 	// validateMiddleware(regSchema),
 	uploadMiddleware.single("avatar"),
-	processImageMiddleware(200, 80),
+	processImageMiddleware(200, 80, false, true),
 	UserController.modify,
 );
-UserRoutes.get(
-	"/avatar/:id",
-	UserController.getAvatar
-)
 UserRoutes.get(
 	"/profile/:id",
 	authenticateMiddleware,

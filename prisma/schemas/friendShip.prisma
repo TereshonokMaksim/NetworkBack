@@ -1,0 +1,11 @@
+model FriendShip {
+  id           Int    @id @default(autoincrement())
+  status       String
+  from_user    User   @relation(fields: [from_user_id], references: [id], name: "from_user_user")
+  from_user_id Int
+  to_user      User   @relation(fields: [to_user_id], references: [id], name: "to_user_user")
+  to_user_id   Int
+
+  @@unique([from_user_id, to_user_id])
+  @@map(name: "user_app_friendship")
+}

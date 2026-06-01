@@ -42,10 +42,9 @@ export const UserController: UserControllerContract = {
 	) {
 		try {
 			const me = await UserService.me({ userId: res.locals.userId });
-			const meFull: UserPowered = {...me, avatarPath: null}
-			if (me.currentAvatarId) {
-				const avatar = await UserService.getAvatarById(me.currentAvatarId)
-				meFull.avatarPath = avatar
+			const meFull: UserPowered = {...me, avatar: null}
+			if (me.avatar) {
+				meFull.avatar = me.avatar
 			}
 			res.status(201).json(meFull);
 		} catch (error) {
@@ -61,11 +60,7 @@ export const UserController: UserControllerContract = {
             // if (req.bn)
 			console.log("why no")
 			const u = await UserService.modify( res.locals.userId, req.body, req.file?.filename);
-			const meFull: UserPowered = {...u, avatarPath: null}
-			if (u.currentAvatarId) {
-				const avatar = await UserService.getAvatarById(u.currentAvatarId)
-				meFull.avatarPath = avatar
-			}
+			const meFull: UserPowered = u
 			console.log("OPA")
 			console.log(meFull)
 			console.log("Im good lol")
@@ -82,14 +77,6 @@ export const UserController: UserControllerContract = {
             console.log("TRYING TO VERIFY", req.body.code)
 			const u = await UserService.verify(res.locals.userId, String(req.body.code))
 			res.status(201).json({"success": u});
-		} catch (error) {
-			next(error);
-		}
-	},
-	async getAvatar(req, res, next) {
-		try {
-			const im = await UserService.getAvatarById(+req.params.id)
-            res.status(200).json({avatar: im})
 		} catch (error) {
 			next(error);
 		}

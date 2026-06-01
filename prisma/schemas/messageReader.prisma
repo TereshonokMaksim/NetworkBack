@@ -1,0 +1,10 @@
+model MessageReader {
+  id        Int     @id @default(autoincrement())
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId Int     @map(name: "message_id")
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map(name: "user_id")
+
+  @@unique([messageId, userId])
+  @@map(name: "chat_app_message_readers")
+}

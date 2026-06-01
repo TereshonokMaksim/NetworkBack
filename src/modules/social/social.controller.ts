@@ -28,6 +28,7 @@ export const SocialController: SocialControllerContract = {
     },
 
     async makeFriend(req, res, next) {
+        console.log("Making friend")
         try {
             const id = +req.params.toId
             if (Number.isNaN(id)){
@@ -41,6 +42,7 @@ export const SocialController: SocialControllerContract = {
         }
     },
     async makeRequest(req, res, next) {
+        console.log("Making request")
         try {
             const id = +req.params.toId
             if (Number.isNaN(id)){

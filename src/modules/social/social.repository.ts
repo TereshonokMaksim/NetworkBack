@@ -24,18 +24,17 @@ export const SocialRepository: SocialRepositoryContract = {
                 where: { id: { in: userIds } },
                 select: {
                     username: true,
-                    nickname: true,
-                    currentAvatar: { select: { image: { select: { compressedImagePath: true } } } },
                     id: true,
                 },
             });
             const goodUsers: ShortUserInfo[] = [];
             for (let uR of usersRaw) {
+                const prof = await PrismaClient.profile.findUniqueOrThrow({where: {userId: uR.id}})
                 goodUsers.push({
                     id: uR.id,
                     username: uR.username ? uR.username : "Unnamed",
-                    pseudonym: uR.nickname ? uR.nickname : "Unnamed",
-                    avatar: uR.currentAvatar?.image.compressedImagePath,
+                    pseudonym: prof.pseudonym ? prof.pseudonym : "Unnamed",
+                    avatar: prof.avatar,
                 });
             }
             return goodUsers;
@@ -48,19 +47,19 @@ export const SocialRepository: SocialRepositoryContract = {
     async getFriends(userId) {
         try {
             let ids: number[] = [];
-            const firstIds = await PrismaClient.userSocial.findMany({
-                where: { firstUserId: userId, status: "friend" },
-                select: { secondUserId: true },
+            const firstIds = await PrismaClient.friendShip.findMany({
+                where: { to_user_id: userId, status: "accepted" },
+                select: { from_user: true },
             });
             firstIds.forEach((el) => {
-                ids.push(el.secondUserId);
+                ids.push(el.from_user.id);
             });
-            const secondIds = await PrismaClient.userSocial.findMany({
-                where: { secondUserId: userId, status: "friend" },
-                select: { firstUserId: true },
+            const secondIds = await PrismaClient.friendShip.findMany({
+                where: { from_user_id: userId, status: "accepted" },
+                select: { to_user: true },
             });
             secondIds.forEach((el) => {
-                ids.push(el.firstUserId);
+                ids.push(el.to_user.id);
             });
             return ids;
         } catch (error) {
@@ -71,12 +70,12 @@ export const SocialRepository: SocialRepositoryContract = {
     async getRequests(userId) {
         try {
             let ids: number[] = [];
-            const firstIds = await PrismaClient.userSocial.findMany({
-                where: { secondUserId: userId, status: "request" },
-                select: { firstUserId: true },
+            const firstIds = await PrismaClient.friendShip.findMany({
+                where: { to_user_id: userId, status: "pending" },
+                select: { from_user: true },
             });
             firstIds.forEach((el) => {
-                ids.push(el.firstUserId);
+                ids.push(el.from_user.id);
             });
             return shuffle(ids);
         } catch (error) {
@@ -86,8 +85,15 @@ export const SocialRepository: SocialRepositoryContract = {
     },
     async getRecomendations(userId, take) {
         try {
+            console.log("FORBIDDEN: ", (await PrismaClient.friendShip.findMany({where: {to_user_id: userId}})).map(el => el.id))
             const ids = await PrismaClient.user.findMany({
-                where: { id: { notIn: [...(await this.getRequests(userId)), ...(await this.getFriends(userId)), userId] } },
+                // where: { id: { notIn: [...(await this.getRequests(userId)), ...(await this.getFriends(userId)), userId] } },
+                where: { 
+                    id: {notIn: [userId,
+                        ...((await PrismaClient.friendShip.findMany({where: {to_user_id: userId}})).map(el => el.from_user_id)),
+                        ...((await PrismaClient.friendShip.findMany({where: {from_user_id: userId}})).map(el => el.to_user_id))
+                    ]}
+                },
                 select: { id: true },
                 take: take
             });
@@ -104,7 +110,7 @@ export const SocialRepository: SocialRepositoryContract = {
 
     async makeFriend(data) {
         try {
-            await PrismaClient.userSocial.create({ data });
+            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "accepted"} });
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -112,7 +118,7 @@ export const SocialRepository: SocialRepositoryContract = {
     },
     async makeRequest(data) {
         try {
-            await PrismaClient.userSocial.create({ data });
+            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "pending"} });
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -122,21 +128,21 @@ export const SocialRepository: SocialRepositoryContract = {
     async deleteFriend(userId, friendId) {
         try {
             try {
-                await PrismaClient.userSocial.delete({
+                await PrismaClient.friendShip.delete({
                     where: { 
-                        firstUserId_secondUserId: { 
-                            firstUserId: userId, 
-                            secondUserId: friendId } 
+                        from_user_id_to_user_id: { 
+                            to_user_id: userId, 
+                            from_user_id: friendId } 
                         },
                     }
                 );
             } catch {   
                 try {
-                    await PrismaClient.userSocial.delete({
+                    await PrismaClient.friendShip.delete({
                         where: { 
-                            firstUserId_secondUserId: { 
-                                firstUserId: friendId, 
-                                secondUserId: userId } 
+                            from_user_id_to_user_id: { 
+                                to_user_id: friendId, 
+                                from_user_id: userId } 
                             },
                         }
                     );
@@ -149,11 +155,11 @@ export const SocialRepository: SocialRepositoryContract = {
     },
     async deleteRequest(userId, requestId) {
         try {
-            await PrismaClient.userSocial.delete({
+            await PrismaClient.friendShip.delete({
                 where: { 
-                    firstUserId_secondUserId: { 
-                        firstUserId: requestId, 
-                        secondUserId: userId } 
+                    from_user_id_to_user_id: { 
+                        from_user_id: requestId, 
+                        to_user_id: userId } 
                     },
                 }
             );

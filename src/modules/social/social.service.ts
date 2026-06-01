@@ -22,7 +22,7 @@ export const SocialService: SocialServiceContract = {
         await SocialRepository.makeFriend({firstUserId: fromUserId, secondUserId: toUserId, status: "friend"})  
     },
     async makeRequest(fromUserId, toUserId) {
-        await SocialRepository.makeFriend({firstUserId: fromUserId, secondUserId: toUserId, status: "request"})  
+        await SocialRepository.makeRequest({firstUserId: fromUserId, secondUserId: toUserId, status: "request"})  
     },
     async deleteFriend(userId, friendId) {
         await SocialRepository.deleteFriend(userId, friendId)

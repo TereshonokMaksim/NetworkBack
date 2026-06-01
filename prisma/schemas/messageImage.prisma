@@ -1,0 +1,8 @@
+model MessageImage {
+  id        Int     @id @default(autoincrement())
+  image     String
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId Int     @map(name: "message_id")
+
+  @@map("chat_app_messageimage")
+}

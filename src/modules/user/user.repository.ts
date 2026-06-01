@@ -1,5 +1,5 @@
 import { UserRepositoryContract } from "./types/user.contracts";
-import type { UserWithPassword, User, UserCreateInput, Profile } from "./types/user.types";
+import type { UserWithPassword, User, UserCreateInput } from "./types/user.types";
 import { PrismaClient } from "../../prisma/client";
 import { InternalServerError } from "../../errors/standartError";
 import { HandleDBError } from "../../errors/dbErrorHandler";
@@ -8,11 +8,28 @@ import { SocialRepository } from "./@x";
 export const UserRepository: UserRepositoryContract = {
     async findByEmailWithPassword(email: string): Promise<UserWithPassword | null> {
         try {
-            return await PrismaClient.user.findFirst({
+            const user = await PrismaClient.user.findFirst({
                 where: {
                     email: email,
                 },
             });
+            const profile = await PrismaClient.profile.findUnique({
+                where: {
+                    userId: user!.id
+                }
+            })
+            return {
+                name: user!.name,
+                id: +user!.id,
+                surname: user!.surname,
+                nickname: profile!.pseudonym,
+                username: user!.username,
+                password: user!.password,
+                email: user!.email,
+                birthday: profile!.birth_date,
+                online: true,
+                verified: true,
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -20,7 +37,8 @@ export const UserRepository: UserRepositoryContract = {
     },
     async findByEmail(email: string): Promise<User | null> {
         try {
-            return await PrismaClient.user.findFirst({
+            console.log(email, "Trying to get by email")
+            const user = await PrismaClient.user.findFirst({
                 where: {
                     email: email,
                 },
@@ -28,6 +46,27 @@ export const UserRepository: UserRepositoryContract = {
                     password: true,
                 },
             });
+            console.log("got user", user)
+            if (!user){return null}
+            console.log("didnt get profile yet")
+            const profile = await PrismaClient.profile.findUniqueOrThrow({
+                where: {
+                    userId: user!.id
+                }
+            })
+            console.log("Profile found!")
+            return {
+                name: user.name,
+                id: user.id,
+                username: user.username,
+                nickname: profile.pseudonym,
+                email: user.email,
+                surname: user.surname,
+                birthday: profile.birth_date,
+                verified: true,
+                online: true,
+                avatar: profile.avatar
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -35,8 +74,27 @@ export const UserRepository: UserRepositoryContract = {
     },
     async create(data: UserCreateInput): Promise<User> {
         try {
+            const user = await PrismaClient.user.create({
+                data
+            });
+            const profile = await PrismaClient.profile.create({
+                data: {
+                    userId: user.id
+                }
+            })
             console.log(data, "data");
-            return await PrismaClient.user.create({ data });
+            return {
+                name: user.name,
+                id: user.id,
+                username: user.username,
+                nickname: profile.pseudonym,
+                email: user.email,
+                surname: user.surname,
+                birthday: profile.birth_date,
+                verified: true,
+                online: true,
+                avatar: profile.avatar
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -44,69 +102,80 @@ export const UserRepository: UserRepositoryContract = {
     },
     async modify(userId, newData) {
         try {
-            return await PrismaClient.user.update({
-                where: { id: userId },
-                data: newData,
-                omit: { password: true },
+            const {name, surname, username, password, email, verified, showNickname, showSignature, currentAvatarId, signatureImageId, ...d} = newData
+            const user = await PrismaClient.user.update({
+                where: {id: userId},
+                data: {
+                    name, surname, username, password, email
+                },
+                omit: {
+                    password: true
+                }
             });
+            const profile = await PrismaClient.profile.update({
+                where: {userId},
+                data: {
+                    pseudonym: d.nickname,
+                    birth_date: d.birthday
+                }
+            })
+            return {
+                name: user.name,
+                id: user.id,
+                username: user.username,
+                nickname: profile.pseudonym,
+                email: user.email,
+                surname: user.surname,
+                birthday: profile.birth_date,
+                verified: true,
+                online: true,
+                avatar: profile.avatar
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
         }
     },
-    async findById(id: number): Promise<User> {
+    async findById(id: number) {
         try {
-            // Unsure if error handling will work without await
-            return await PrismaClient.user.findFirstOrThrow({
-                where: { id },
+            const user = await PrismaClient.user.findFirstOrThrow({
+                where: {
+                    id,
+                },
                 omit: {
                     password: true,
                 },
             });
+            const profile = await PrismaClient.profile.findUniqueOrThrow({
+                where: {
+                    userId: user!.id
+                }
+            })
+            return {
+                name: user.name,
+                id: user.id,
+                username: user.username,
+                nickname: profile.pseudonym,
+                email: user.email,
+                surname: user.surname,
+                birthday: profile.birth_date,
+                verified: true,
+                online: true,
+                avatar: profile.avatar
+            }
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
         }
     },
-    async createImage(originalImagePath, compressedImagePath) {
+    async createAvatar(userId, image) {
         try {
+            console.log("Trying to create avatar", userId, image)
             // Unsure if error handling will work without await
-            return await PrismaClient.image.create({
-                data: { originalImagePath, compressedImagePath },
-            });
-        } catch (error) {
-            HandleDBError(error);
-            throw new InternalServerError("huh");
-        }
-    },
-    async createAvatar(userId, imageId) {
-        try {
-            // Unsure if error handling will work without await
-            return await PrismaClient.avatar.create({
-                data: { userId, imageId },
-            });
-        } catch (error) {
-            HandleDBError(error);
-            throw new InternalServerError("huh");
-        }
-    },
-    async getImageById(imageId) {
-        try {
-            // Unsure if error handling will work without await
-            return await PrismaClient.image.findFirstOrThrow({
-                where: { id: imageId },
-            });
-        } catch (error) {
-            HandleDBError(error);
-            throw new InternalServerError("huh");
-        }
-    },
-    async getAvatarById(avatarId) {
-        try {
-            // Unsure if error handling will work without await
-            return await PrismaClient.avatar.findFirstOrThrow({
-                where: { id: avatarId },
-            });
+            await PrismaClient.profile.update({
+                where: {userId},
+                data: {avatar: image}
+            })
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -118,31 +187,32 @@ export const UserRepository: UserRepositoryContract = {
                 where: { id: userId },
                 select: {
                     username: true,
-                    nickname: true,
-                    currentAvatar: { select: { image: { select: { compressedImagePath: true } } } },
                     id: true,
                 },
             });
+            const prof = await PrismaClient.profile.findUniqueOrThrow({
+                where: { userId }
+            })
             let status = "none";
-            if (!!(await PrismaClient.userSocial.findUnique({
-                    where: { firstUserId_secondUserId: { firstUserId: userId, secondUserId: myId }, status: "friend" },
-                })) || !!(await PrismaClient.userSocial.findUnique({
-                    where: { firstUserId_secondUserId: { firstUserId: userId, secondUserId: myId }, status: "friend" },
+            if (!!(await PrismaClient.friendShip.findUnique({
+                    where: { from_user_id_to_user_id: { to_user_id: userId, from_user_id: myId }, status: "accepted" },
+                })) || !!(await PrismaClient.friendShip.findUnique({
+                    where: { from_user_id_to_user_id: { from_user_id: userId, to_user_id: myId }, status: "accepted" },
                 }))
             ) {
 				status = "friends"
 			}
-			else if (!!(await PrismaClient.userSocial.findUnique({where: { firstUserId_secondUserId: { firstUserId: userId, secondUserId: myId }, status: "request" }}))){
+			else if (!!(await PrismaClient.friendShip.findUnique({where: { from_user_id_to_user_id: { from_user_id: userId, to_user_id: myId }, status: "pending" }}))){
 				status = "request"
 			}
-			else if (!!(await PrismaClient.userSocial.findUnique({where: { firstUserId_secondUserId: { firstUserId: myId, secondUserId: userId }, status: "request" }}))){
+			else if (!!(await PrismaClient.friendShip.findUnique({where: { from_user_id_to_user_id: { from_user_id: myId, to_user_id: userId }, status: "pending" }}))){
 				status = "pending"
 			}
 			return {
 				id: uR.id,
 				username: uR.username ? uR.username : "Unnamed",
-				pseudonym: uR.nickname ? uR.nickname : "Unnamed",
-				avatar: uR.currentAvatar?.image.compressedImagePath,
+				pseudonym: prof.pseudonym ? prof.pseudonym : "Unnamed",
+				avatar: prof.avatar,
 				postsTotal: await PrismaClient.post.count({ where: { authorId: userId } }),
 				readers: 0,
 				friends: (await SocialRepository.getFriends(userId)).length,

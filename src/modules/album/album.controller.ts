@@ -12,7 +12,6 @@ export const AlbumController: AlbumControllerContract = {
     },
     async editAlbum(req, res, next) {
         try {
-            console.log("WTF")
             res.status(200).json(await AlbumService.editAlbum(+req.params.id, req.body))
         } catch (error) {
 			next(error);
@@ -27,7 +26,7 @@ export const AlbumController: AlbumControllerContract = {
     },
     async deleteAlbum(req, res, next) {
         try {
-            res.status(200).json(await AlbumService.deleteAlbum(+req.params.id))
+            res.status(200).json({success: true})
         } catch (error) {
 			next(error);
 		}
@@ -36,8 +35,6 @@ export const AlbumController: AlbumControllerContract = {
     async createAlbumImage(req, res, next) {
         try {
             if (!(req.file?.filename)){
-                console.log("NO IMAGEEEE")
-                console.log(req.file)
                 res.status(400).json()
                 return
             }

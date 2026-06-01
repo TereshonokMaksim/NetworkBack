@@ -26,14 +26,7 @@ export const PostService: PostServiceContract = {
             linksCooked.push((await PostRepository.createPostLink(post.id, l)).link)
         }
         const user = await UserRepository.findById(data.authorId)
-        let avatarPath: null | string = null
-        if (user.currentAvatarId){
-            const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
-            if (avatar){
-                const image = await UserRepository.getImageById(avatar.imageId)!
-                avatarPath = image.compressedImagePath
-            }
-        }
+        let avatarPath: null | string | undefined = user.avatar
         return {...post, images: imagesCooked, tags: tagsCooked, links: linksCooked, authorUsername: user.username!, authorAvatarPath: avatarPath}
     },
     async getAllPosts(page, postsPerPage) {
@@ -48,14 +41,7 @@ export const PostService: PostServiceContract = {
                 cookedLinks.push(l.link)
             }
             const user = await UserRepository.findById(post.authorId)
-            let avatarPath: null | string = null
-            if (user.currentAvatarId){
-                const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
-                if (avatar){
-                    const image = await UserRepository.getImageById(avatar.imageId)!
-                    avatarPath = image.compressedImagePath
-                }
-            }
+            let avatarPath: null | string | undefined = user.avatar
             cookedPosts.push({...post, images, tags, links: cookedLinks, authorUsername: user.username!, authorAvatarPath: avatarPath})
         }
         return cookedPosts
@@ -72,14 +58,7 @@ export const PostService: PostServiceContract = {
                 cookedLinks.push(l.link)
             }
             const user = await UserRepository.findById(post.authorId)!
-            let avatarPath: null | string = null
-            if (user.currentAvatarId){
-                const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
-                if (avatar){
-                    const image = await UserRepository.getImageById(avatar.imageId)!
-                    avatarPath = image.compressedImagePath
-                }
-            }
+            let avatarPath: null | string | undefined = user.avatar
             cookedPosts.push({...post, images, tags, links: cookedLinks, authorUsername: user.username!, authorAvatarPath: avatarPath})
         }
         return cookedPosts
@@ -118,14 +97,14 @@ export const PostService: PostServiceContract = {
             linksCooked.push((await PostRepository.createPostLink(post.id, l)).link)
         }
         const user = await UserRepository.findById(post.authorId)
-        let avatarPath: null | string = null
-        if (user.currentAvatarId){
-            const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
-            if (avatar){
-                const image = await UserRepository.getImageById(avatar.imageId)!
-                avatarPath = image.compressedImagePath
-            }
-        }
+        let avatarPath: null | string | undefined = user.avatar
+        // if (user.currentAvatarId){
+        //     const avatar = await UserRepository.getAvatarById(user.currentAvatarId)
+        //     if (avatar){
+        //         const image = await UserRepository.getImageById(avatar.imageId)!
+        //         avatarPath = image.compressedImagePath
+        //     }
+        // }
         return {...post, images: imagesCooked, tags: tagsCooked, links: linksCooked, authorUsername: user.username!, authorAvatarPath: avatarPath}
     },
     async deletePost(postId) {

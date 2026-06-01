@@ -1,8 +1,11 @@
 model AlbumImage {
-  id      Int     @id @default(autoincrement())
-  image   Image   @relation(fields: [imageId], references: [id])
-  imageId Int
-  album   Album   @relation(fields: [albumId], references: [id])
-  albumId Int
-  shown   Boolean @default(true)
+  id         Int   @id @default(autoincrement())
+  image      String   @db.VarChar(100)
+  is_shown   Boolean
+  created_at DateTime @db.Timestamptz(6)
+  albumId    Int   @map("album_id")
+  album      Album    @relation(fields: [albumId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_app_albumima_album_id_9736c867_fk_profile_a")
+
+  @@index([albumId], map: "profile_app_albumimage_album_id_9736c867")
+  @@map("profile_app_albumimage")
 }
