@@ -1,10 +1,12 @@
 model PostTag {
-  id     Int  @id @default(autoincrement())
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map(name: "post_id")
-  tag    Tag  @relation(fields: [tagId], references: [id])
-  tagId  Int  @map(name: "tag_id")
+  id     Int @id @default(autoincrement())
+  postId Int @map("post_id")
+  tagId  Int @map("tag_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_app_post_tags_post_id_b72298ea_fk_post_app_post_id")
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_app_post_tags_tag_id_df0ee56c_fk_post_app_tag_id")
 
-  @@unique([postId, tagId])
-  @@map(name: "post_app_post_tags")
+  @@unique([postId, tagId], map: "post_app_post_tags_post_id_tag_id_f9d7c733_uniq")
+  @@index([postId], map: "post_app_post_tags_post_id_b72298ea")
+  @@index([tagId], map: "post_app_post_tags_tag_id_df0ee56c")
+  @@map("post_app_post_tags")
 }

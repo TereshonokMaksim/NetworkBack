@@ -21,7 +21,7 @@ export const SocialRepository: SocialRepositoryContract = {
     async getUserShortInfo(userIds) {
         try {
             const usersRaw = await PrismaClient.user.findMany({
-                where: { id: { in: userIds } },
+                where: { id: { in: userIds }, profile: {isNot: null} },
                 select: {
                     username: true,
                     id: true,
@@ -110,7 +110,7 @@ export const SocialRepository: SocialRepositoryContract = {
 
     async makeFriend(data) {
         try {
-            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "accepted"} });
+            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "accepted", created_at: new Date()} });
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");
@@ -118,7 +118,7 @@ export const SocialRepository: SocialRepositoryContract = {
     },
     async makeRequest(data) {
         try {
-            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "pending"} });
+            await PrismaClient.friendShip.create({ data: {to_user_id: data.secondUserId, from_user_id: data.firstUserId, status: "pending", created_at: new Date()} });
         } catch (error) {
             HandleDBError(error);
             throw new InternalServerError("huh");

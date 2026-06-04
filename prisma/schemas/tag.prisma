@@ -1,7 +1,7 @@
 model Tag {
-  id       Int       @id @default(autoincrement())
-  name     String
+  id       Int    @id @default(autoincrement())
+  name     String    @db.VarChar(100)
   postTags PostTag[]
 
-  @@map(name: "post_app_tag")
+  @@map("post_app_tag")
 }

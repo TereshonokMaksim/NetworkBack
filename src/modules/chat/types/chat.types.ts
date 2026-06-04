@@ -46,6 +46,30 @@ export type MessageFull = Prisma.MessageGetPayload<{
         }
     }
 }>
+export type MessageFullFront = {
+    sender: {
+        name: string | null;
+        id: number;
+        surname: string | null;
+        profile: {
+            avatar: string | null;
+        };
+    };
+    messageReaders: {
+        user: {
+            id: number;
+        };
+    }[];
+    messageImages: {
+        id: number;
+        image: string;
+    }[];
+    id: number;
+    text: string;
+    chatId: number;
+    created_at: Date;
+    senderId: number;
+}
 export type MessageImage = Prisma.MessageImageGetPayload<{}>
 export type CreateMessageDto = {
     senderId: number,
@@ -57,7 +81,7 @@ export type ChatInfo = {
     id: number,
     name: string | null,
     isGroup: boolean,
-    messages: MessageFull[],
+    messages: MessageFullFront[],
     avatar: string | null | undefined,
     peopleOnline: number[],
     userIsAdmin: boolean
@@ -70,7 +94,7 @@ export type ChatShort = {
     name: string | null,
     isGroup: boolean,
     isOnline: boolean,
-    lastMessage: MessageFull | null,
+    lastMessage: MessageFullFront | null,
     avatar: string | null | undefined,
     peopleOnline: number[],
     userIsAdmin: boolean
@@ -82,8 +106,8 @@ export type NewMessage = Prisma.MessageGetPayload<{
         sender: {
             select: {
                 id: true,
-                name: true,
-                surname: true,
+                first_name: true,
+                last_name: true,
                 profile: {
                     select: {
                         avatar: true
@@ -99,3 +123,22 @@ export type NewMessage = Prisma.MessageGetPayload<{
         }
     }
 }>
+export type NewMessageFront = {
+    sender: {
+        name: string | null;
+        id: number;
+        surname: string | null;
+        profile: {
+            avatar: string | null;
+        } | null;
+    };
+    messageImages: {
+        id: number;
+        image: string;
+    }[];
+    id: number;
+    text: string;
+    chatId: number;
+    created_at: Date;
+    senderId: number;
+}

@@ -10,13 +10,14 @@ export const PostRepository: PostRepositoryContract = {
                 authorId: data.authorId,
                 title: data.title,
                 content: data.text,
-                topic: data.topic
+                topic: data.topic,
+                created_at: new Date()
             } });
             return {
                 id: post.id,
                 authorId: post.authorId,
                 title: post.title,
-                topic: post.topic,
+                topic: post.topic!,
                 text: post.content,
                 likes: 0,
                 hearted: 0,
@@ -38,7 +39,7 @@ export const PostRepository: PostRepositoryContract = {
                 id: post.id,
                 authorId: post.authorId,
                 title: post.title,
-                topic: post.topic,
+                topic: post.topic!,
                 text: post.content,
                 likes: 0,
                 hearted: 0,
@@ -128,7 +129,7 @@ export const PostRepository: PostRepositoryContract = {
             const postLink = await PrismaClient.postLink.create({
                 data: {
                     postId: postId,
-                    link: url,
+                    url: url,
                 },
             });
             return postLink;
@@ -185,7 +186,7 @@ export const PostRepository: PostRepositoryContract = {
                 id: post.id,
                 authorId: post.authorId,
                 title: post.title,
-                topic: post.topic,
+                topic: post.topic!,
                 text: post.content,
                 likes: 0,
                 hearted: 0,
@@ -204,7 +205,7 @@ export const PostRepository: PostRepositoryContract = {
                 id: post.id,
                 authorId: post.authorId,
                 title: post.title,
-                topic: post.topic,
+                topic: post.topic!,
                 text: post.content,
                 likes: 0,
                 hearted: 0,

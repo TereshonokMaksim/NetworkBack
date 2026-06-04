@@ -1,10 +1,12 @@
 model PostHeart {
-  id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map(name: "user_id")
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map(name: "post_id")
+  id     Int @id @default(autoincrement())
+  postId Int @map("post_id")
+  userId Int @map("user_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_app_postheart_post_id_556aaef5_fk_post_app_post_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_app_postheart_user_id_e3112196_fk_user_app_user_id")
 
-  @@unique([postId, userId])
-  @@map(name: "post_app_postheart")
+  @@unique([userId, postId], map: "unique_post_hearts")
+  @@index([postId], map: "post_app_postheart_post_id_556aaef5")
+  @@index([userId], map: "post_app_postheart_user_id_e3112196")
+  @@map("post_app_postheart")
 }

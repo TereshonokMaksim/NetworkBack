@@ -23,7 +23,7 @@ export const PostService: PostServiceContract = {
             tagsCooked.push(await PostRepository.createPostTag(post.id, tag))
         }
         for (let l of JSON.parse(links)){
-            linksCooked.push((await PostRepository.createPostLink(post.id, l)).link)
+            linksCooked.push((await PostRepository.createPostLink(post.id, l)).url)
         }
         const user = await UserRepository.findById(data.authorId)
         let avatarPath: null | string | undefined = user.avatar
@@ -38,7 +38,7 @@ export const PostService: PostServiceContract = {
             const links = await PostRepository.getPostLinks(post.id)
             const cookedLinks = []
             for (let l of links){
-                cookedLinks.push(l.link)
+                cookedLinks.push(l.url)
             }
             const user = await UserRepository.findById(post.authorId)
             let avatarPath: null | string | undefined = user.avatar
@@ -55,7 +55,7 @@ export const PostService: PostServiceContract = {
             const links = await PostRepository.getPostLinks(post.id)
             const cookedLinks = []
             for (let l of links){
-                cookedLinks.push(l.link)
+                cookedLinks.push(l.url)
             }
             const user = await UserRepository.findById(post.authorId)!
             let avatarPath: null | string | undefined = user.avatar
@@ -94,7 +94,7 @@ export const PostService: PostServiceContract = {
             tagsCooked.push(await PostRepository.createPostTag(post.id, tag))
         }
         for (let l of JSON.parse(newLinks)){
-            linksCooked.push((await PostRepository.createPostLink(post.id, l)).link)
+            linksCooked.push((await PostRepository.createPostLink(post.id, l)).url)
         }
         const user = await UserRepository.findById(post.authorId)
         let avatarPath: null | string | undefined = user.avatar

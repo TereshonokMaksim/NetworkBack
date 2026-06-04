@@ -110,7 +110,7 @@ export const ChatService: ChatServiceContract = {
         if (!data){
             throw new Error("???")
         }
-        return {...message, messageImages: imama, sender: {
+        return {...message, text: message.text!, messageImages: imama, sender: {
             id: data.id,
             name: data.name,
             surname: data.surname,

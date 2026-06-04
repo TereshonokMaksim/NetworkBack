@@ -5,48 +5,71 @@ import type { ChatSocketControllerContact } from "./types/chat.contracts";
 import type { CreateMessageDto, Message, NewMessage } from "./types/chat.types";
 
 export const MessageSocketController: ChatSocketControllerContact = {
-	sendMessage: async function (
-		socket: ClientSocket,
-		payload: CreateMessageDto,
-	): Promise<void> {
-        console.log("GOT REQUEST.")
-		try {
-			const message = await ChatService.sendMessage({
-				...payload,
-				senderId: socket.data.userId,
-			});
-            const data = await ChatRepository.getShortUserData(socket.data.userId)
-            if (!data) throw new Error("HOW")
-			this.newChatMessage(socket, {...message, sender: data, messageImages: []});
-		} catch (error) {
-			console.error(error);
-		}
-	},
+    sendMessage: async function (socket: ClientSocket, payload: CreateMessageDto): Promise<void> {
+        console.log("GOT REQUEST.");
+        try {
+            const message = await ChatService.sendMessage({
+                ...payload,
+                senderId: socket.data.userId,
+            });
+            const data = await ChatRepository.getShortUserData(socket.data.userId);
+            if (!data) throw new Error("HOW");
+            this.newChatMessage(socket, {
+                ...message,
+                sender: { ...data, first_name: data.name!, last_name: data.surname! },
+                messageImages: [],
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    },
     enterChat: async function (socket, payload) {
         // TODO: defense mechanism against entering
         //       other peoples' chats
-        console.log("Room connect")
-        socket.join(`chatRoom-${payload.chatId}`)
+        console.log("Room connect");
+        socket.join(`chatRoom-${payload.chatId}`);
     },
     leaveChat(socket, payload) {
-        socket.leave(`chatRoom-${payload.chatId}`)
+        socket.leave(`chatRoom-${payload.chatId}`);
     },
-	newChatMessage: function (socket: ClientSocket, payload: NewMessage): void {
+    newChatMessage: function (socket: ClientSocket, payload: NewMessage): void {
         let socketName: string = "";
-        console.log("Trying to send message")
-        for (let sockNamePot of socket.rooms){
-            if (sockNamePot.startsWith("chatRoom")){
-                socketName = sockNamePot
-                break
+        console.log("Trying to send message");
+        for (let sockNamePot of socket.rooms) {
+            if (sockNamePot.startsWith("chatRoom")) {
+                socketName = sockNamePot;
+                break;
             }
         }
-        console.log("Found room: ", socketName)
-        socket.to(socketName).emit("newChatMessage", payload)
-        socket.emit("newChatMessage", payload)
-	},
-	registerHandlers: function (socketManager: SocketManagerContract): void {
-		socketManager.addEvent("sendMessage", this.sendMessage.bind(this));
-        socketManager.addEvent("enterChat", this.enterChat.bind(this))
-        socketManager.addEvent("leaveChat", this.leaveChat.bind(this))
-	},
+        console.log("Found room: ", socketName);
+        socket
+            .to(socketName)
+            .emit("newChatMessage", {
+                ...payload,
+                text: payload.text!,
+                senderId: payload.senderId!,
+                sender: {
+                    id: payload.sender!.id,
+                    name: payload.sender?.first_name ? payload.sender?.first_name : null,
+                    surname: payload.sender?.last_name ? payload.sender?.last_name : null,
+                    profile: payload.sender!.profile
+                },
+            });
+        socket.emit("newChatMessage", {
+                ...payload,
+                text: payload.text!,
+                senderId: payload.senderId!,
+                sender: {
+                    id: payload.sender!.id,
+                    name: payload.sender?.first_name ? payload.sender?.first_name : null,
+                    surname: payload.sender?.last_name ? payload.sender?.last_name : null,
+                    profile: payload.sender!.profile
+                },
+            });
+    },
+    registerHandlers: function (socketManager: SocketManagerContract): void {
+        socketManager.addEvent("sendMessage", this.sendMessage.bind(this));
+        socketManager.addEvent("enterChat", this.enterChat.bind(this));
+        socketManager.addEvent("leaveChat", this.leaveChat.bind(this));
+    },
 };

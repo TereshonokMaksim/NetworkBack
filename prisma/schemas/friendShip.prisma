@@ -1,11 +1,14 @@
 model FriendShip {
-  id           Int    @id @default(autoincrement())
-  status       String
-  from_user    User   @relation(fields: [from_user_id], references: [id], name: "from_user_user")
+  id           Int   @id @default(autoincrement())
+  status       String   @db.VarChar(10)
+  created_at   DateTime @db.Timestamptz(6)
   from_user_id Int
-  to_user      User   @relation(fields: [to_user_id], references: [id], name: "to_user_user")
   to_user_id   Int
+  from_user    User     @relation("from_user_user", fields: [from_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_app_friendship_from_user_id_e1d46b12_fk_user_app_user_id")
+  to_user      User     @relation("to_user_user", fields: [to_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_app_friendship_to_user_id_f5d68c80_fk_user_app_user_id")
 
-  @@unique([from_user_id, to_user_id])
-  @@map(name: "user_app_friendship")
+  @@unique([from_user_id, to_user_id], map: "user_app_friendship_from_user_id_to_user_id_1917f941_uniq")
+  @@index([from_user_id], map: "user_app_friendship_from_user_id_e1d46b12")
+  @@index([to_user_id], map: "user_app_friendship_to_user_id_f5d68c80")
+  @@map("user_app_friendship")
 }

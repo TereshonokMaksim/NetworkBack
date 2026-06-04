@@ -66,13 +66,13 @@ export const ChatController: ChatControllerContract = {
             const data = await ChatService.sendMessageWithImages({
                 senderId: userId,
                 text,
-                chatId, 
+                chatId: Number(chatId), 
                 messageImages: res.locals.files ? res.locals.files.map(el => el.filename) : []
             })
             const ioServer = req.app.get("ioServer")
             console.log("io server")
-            console.log(ioServer)
-            ioServer.emit(`chatRoom-${chatId}`, data)
+            // console.log(ioServer)
+            ioServer.to(`chatRoom-${chatId}`).emit("newChatMessage", data)
             res.status(200).json({success: true})
         }
         catch (error){

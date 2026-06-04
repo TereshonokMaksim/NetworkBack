@@ -1,10 +1,12 @@
 model MessageReader {
-  id        Int     @id @default(autoincrement())
-  message   Message @relation(fields: [messageId], references: [id])
-  messageId Int     @map(name: "message_id")
-  user      User    @relation(fields: [userId], references: [id])
-  userId    Int     @map(name: "user_id")
+  id        Int  @id @default(autoincrement())
+  messageId Int  @map("message_id")
+  userId    Int  @map("user_id")
+  message   Message @relation(fields: [messageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "chat_app_message_rea_message_id_adafa038_fk_chat_app_")
+  user      User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "chat_app_message_readers_user_id_11fb5647_fk_user_app_user_id")
 
-  @@unique([messageId, userId])
-  @@map(name: "chat_app_message_readers")
+  @@unique([messageId, userId], map: "chat_app_message_readers_message_id_user_id_dfa7b323_uniq")
+  @@index([messageId], map: "chat_app_message_readers_message_id_adafa038")
+  @@index([userId], map: "chat_app_message_readers_user_id_11fb5647")
+  @@map("chat_app_message_readers")
 }

@@ -15,8 +15,8 @@ export const ChatRepository: ChatRepositoryContract = {
                     sender: {
                         select: {
                             id: true,
-                            name: true,
-                            surname: true,
+                            first_name: true,
+                            last_name: true,
                             profile: {
                                 select: {
                                     avatar: true,
@@ -39,7 +39,18 @@ export const ChatRepository: ChatRepositoryContract = {
                     },
                 },
             });
-            return messages
+            const cooked = messages.map(el => {return {
+                ...el,
+                text: el.text!,
+                senderId: el.senderId!,
+                sender: {
+                    id: el.sender!.id,
+                    name: el.sender?.first_name ? el.sender?.first_name : null,
+                    surname: el.sender?.last_name ? el.sender?.last_name : null,
+                    profile: el.sender!.profile!
+                },
+            }})
+            return cooked
         } catch (error) {
             HandleDBError(error);
             console.error("Unkown error at getAllMessageByChat.");
@@ -70,6 +81,7 @@ export const ChatRepository: ChatRepositoryContract = {
                     text: data.text,
                     chatId: data.chatId,
                     senderId: data.senderId,
+                    created_at: new Date()
                 },
             });
             await PrismaClient.messageReader.create({data: {userId: data.senderId, messageId: message.id}})
@@ -153,8 +165,8 @@ export const ChatRepository: ChatRepositoryContract = {
                 },
                 select: {
                     id: true,
-                    name: true,
-                    surname: true,
+                    first_name: true,
+                    last_name: true,
                     profile: {
                         select: {
                             avatar: true,
@@ -168,8 +180,8 @@ export const ChatRepository: ChatRepositoryContract = {
             }
             const n = {
                 id: data.id,
-                name: data.name,
-                surname: data.surname,
+                name: data.first_name,
+                surname: data.last_name,
                 profile: data.profile!,
             };
             return n;
@@ -207,7 +219,7 @@ export const ChatRepository: ChatRepositoryContract = {
     },
     async getChatLastMessage(chatId) {
         try {
-            return await PrismaClient.message.findFirst({
+            const el = await PrismaClient.message.findFirst({
                 where: {
                     chatId,
                 },
@@ -215,8 +227,8 @@ export const ChatRepository: ChatRepositoryContract = {
                     sender: {
                         select: {
                             id: true,
-                            name: true,
-                            surname: true,
+                            first_name: true,
+                            last_name: true,
                             profile: {
                                 select: {
                                     avatar: true,
@@ -242,6 +254,18 @@ export const ChatRepository: ChatRepositoryContract = {
                     id: "desc"
                 }
             });
+            if (!el) return el
+            return {
+                ...el,
+                text: el.text!,
+                senderId: el.senderId!,
+                sender: {
+                    id: el.sender!.id,
+                    name: el.sender?.first_name ? el.sender?.first_name : null,
+                    surname: el.sender?.last_name ? el.sender?.last_name : null,
+                    profile: el.sender!.profile!
+                },
+            }
         } catch (error) {
             HandleDBError(error);
             throw error;

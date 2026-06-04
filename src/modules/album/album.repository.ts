@@ -9,7 +9,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
     async createAlbum(albumName, tagName, userId, year) {
         try {
             const profile = await PrismaClient.profile.findUnique({where: {userId: userId}})
-            const album = await PrismaClient.album.create({data: {name: albumName, theme: tagName, profileId: profile!.id, year: year}})
+            const d = {name: albumName, theme: tagName, profileId: profile!.id, year: year, shown: true, createdAt: new Date(), is_default: false}
+            const album = await PrismaClient.album.create({data: d})
             return {
                 id: album.id,
                 name: album.name,
@@ -18,8 +19,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
                 createdAt: album.createdAt,
                 previewImageId: -1,
                 avatarOnly: false,
-                tag: album.theme,
-                year: album.year
+                tag: album.theme!,
+                year: album.year!
             }
         }
         catch (error){
@@ -34,13 +35,13 @@ export const AlbumRepository: AlbumRepositoryContract = {
             return {
                 id: album.id,
                 name: album.name,
-                userId: user.id,
+                userId: user!.id,
                 shown: album.shown,
                 createdAt: album.createdAt,
                 previewImageId: -1,
                 avatarOnly: false,
-                tag: album.theme,
-                year: album.year
+                tag: album.theme!,
+                year: album.year!
             }
         }
         catch (error){
@@ -55,13 +56,13 @@ export const AlbumRepository: AlbumRepositoryContract = {
             return {
                 id: album.id,
                 name: album.name,
-                userId: user.id,
+                userId: user!.id,
                 shown: album.shown,
                 createdAt: album.createdAt,
                 previewImageId: -1,
                 avatarOnly: false,
-                tag: album.theme,
-                year: album.year
+                tag: album.theme!,
+                year: album.year!
             }
         }
         catch (error){
@@ -81,8 +82,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
                 createdAt: el.createdAt,
                 previewImageId: -1,
                 avatarOnly: false,
-                tag: el.theme,
-                year: el.year
+                tag: el.theme!,
+                year: el.year!
             }})
             return newAlbums
         }
@@ -104,7 +105,7 @@ export const AlbumRepository: AlbumRepositoryContract = {
 
     async createAlbumImage(originalImagePath, compressedImagePath, albumId) {
         try {
-            const aim = await PrismaClient.albumImage.create({data: {image: originalImagePath, albumId}})
+            const aim = await PrismaClient.albumImage.create({data: {image: originalImagePath, albumId, is_shown: true, created_at: new Date()}})
             return {id: aim.id, albumId: aim.albumId, shown: aim.is_shown, originalImagePath: aim.image}
         }
         catch (error){
@@ -114,7 +115,7 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async createAlbumImageByImage(image, albumId) {
         try {
-            const aim = await PrismaClient.albumImage.create({data: {image, albumId}})
+            const aim = await PrismaClient.albumImage.create({data: {image, albumId, is_shown: true, created_at: new Date()}})
             return {id: aim.id, albumId: aim.albumId, shown: aim.is_shown, image: aim.image}
         }
         catch (error){
@@ -178,8 +179,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
                 createdAt: ma.createdAt,
                 previewImageId: -1,
                 avatarOnly: false,
-                tag: ma.theme,
-                year: ma.year
+                tag: ma.theme!,
+                year: ma.year!
             }
         }
         catch (error){

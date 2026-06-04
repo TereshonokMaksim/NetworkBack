@@ -13,6 +13,7 @@ import { createServer } from "node:http";
 import { MessageSocketController } from "../modules/chat/chat.socket.controller";
 import { authenticateSocketMiddleware } from "../middlewares/authenticate.middleware";
 import { startTunnel } from "../config/db.tunnel";
+import { logMiddleware } from "../middlewares/log.middleware";
 
 
 const app = express()
@@ -26,6 +27,7 @@ const PORT = ENV.PORT || 3001
 app.use(express.json())
 // if (ENV.FRONT_ORIGIN){
 app.use(cors())
+app.use(logMiddleware)
 // }
 app.use("/users/", UserRoutes)
 app.use("/albums/", AlbumRoutes)
@@ -51,7 +53,7 @@ app.set("ioServer", socketManager.ioServer)
 
 async function bootstrap(){
     try {
-        await startTunnel() 
+        // await startTunnel() 
 		setInterval(() => {
 			console.log('tick', Date.now());
 		}, 20000);

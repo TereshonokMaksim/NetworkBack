@@ -19,14 +19,14 @@ export const UserRepository: UserRepositoryContract = {
                 }
             })
             return {
-                name: user!.name,
+                name: user!.first_name,
                 id: +user!.id,
-                surname: user!.surname,
+                surname: user!.last_name,
                 nickname: profile!.pseudonym,
                 username: user!.username,
                 password: user!.password,
                 email: user!.email,
-                birthday: profile!.birth_date,
+                birthday: profile!.birth_date?.toDateString() ? profile!.birth_date?.toDateString() : null,
                 online: true,
                 verified: true,
             }
@@ -56,13 +56,13 @@ export const UserRepository: UserRepositoryContract = {
             })
             console.log("Profile found!")
             return {
-                name: user.name,
+                name: user.first_name,
                 id: user.id,
                 username: user.username,
                 nickname: profile.pseudonym,
                 email: user.email,
-                surname: user.surname,
-                birthday: profile.birth_date,
+                surname: user.last_name,
+                birthday: profile.birth_date?.toDateString() ? profile.birth_date?.toDateString() : null,
                 verified: true,
                 online: true,
                 avatar: profile.avatar
@@ -75,22 +75,33 @@ export const UserRepository: UserRepositoryContract = {
     async create(data: UserCreateInput): Promise<User> {
         try {
             const user = await PrismaClient.user.create({
-                data
+                data: {
+                    email: data.email,
+                    password: data.password,
+                    first_name: "",
+                    last_name: "",
+                    is_active: false,
+                    is_staff: false,
+                    is_superuser: false,
+                    date_joined: new Date()
+                }
             });
             const profile = await PrismaClient.profile.create({
                 data: {
-                    userId: user.id
+                    userId: user.id,
+                    is_image_signature: false,
+                    is_text_signature: false
                 }
             })
             console.log(data, "data");
             return {
-                name: user.name,
+                name: user.first_name,
                 id: user.id,
                 username: user.username,
                 nickname: profile.pseudonym,
                 email: user.email,
-                surname: user.surname,
-                birthday: profile.birth_date,
+                surname: user.last_name,
+                birthday: profile.birth_date?.toDateString() ? profile.birth_date?.toDateString() : null,
                 verified: true,
                 online: true,
                 avatar: profile.avatar
@@ -120,13 +131,13 @@ export const UserRepository: UserRepositoryContract = {
                 }
             })
             return {
-                name: user.name,
+                name: user.first_name,
                 id: user.id,
                 username: user.username,
                 nickname: profile.pseudonym,
                 email: user.email,
-                surname: user.surname,
-                birthday: profile.birth_date,
+                surname: user.last_name,
+                birthday: profile.birth_date?.toDateString() ? profile.birth_date?.toDateString() : null,
                 verified: true,
                 online: true,
                 avatar: profile.avatar
@@ -152,13 +163,13 @@ export const UserRepository: UserRepositoryContract = {
                 }
             })
             return {
-                name: user.name,
+                name: user.first_name,
                 id: user.id,
                 username: user.username,
                 nickname: profile.pseudonym,
                 email: user.email,
-                surname: user.surname,
-                birthday: profile.birth_date,
+                surname: user.last_name,
+                birthday: profile.birth_date?.toDateString() ? profile.birth_date?.toDateString() : null,
                 verified: true,
                 online: true,
                 avatar: profile.avatar

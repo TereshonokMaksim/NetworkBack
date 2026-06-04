@@ -1,19 +1,19 @@
 model Post {
-  id       Int    @id @default(autoincrement())
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId Int    @map(name: "author_id")
-  title    String
-  topic    String
-  content  String
-
-  updated_at DateTime    @updatedAt
-  created_at DateTime    @default(now())
+  id         Int      @id @default(autoincrement())
+  title      String      @db.VarChar(255)
+  topic      String?     @db.VarChar(255)
+  content    String
+  created_at DateTime    @db.Timestamptz(6)
+  authorId   Int      @map("author_id")
+  updated_at DateTime?   @updatedAt @db.Timestamptz(6)
+  author     User        @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_app_post_author_id_4cf2f14d_fk_user_app_user_id")
+  postTags   PostTag[]
   postHearts PostHeart[]
   postImages PostImage[]
   postLikes  PostLike[]
   postLinks  PostLink[]
   postViews  PostView[]
-  postTags   PostTag[]
 
-  @@map(name: "post_app_post")
+  @@index([authorId], map: "post_app_post_author_id_4cf2f14d")
+  @@map("post_app_post")
 }

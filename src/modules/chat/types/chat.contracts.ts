@@ -1,6 +1,6 @@
 import type { ClientSocket, SocketController } from "../../../socket/socket.types";
 import type { AuthenticatedUser } from "../../../types/standartTypes";
-import type { Message, MessageFull, CreateMessageDto, ChatInfo, Chat, NewMessage, ShortUserData, ChatShort, ChatE, UnreadMessagesInfo, MessageImage } from "./chat.types";
+import type { Message, MessageFull, CreateMessageDto, ChatInfo, Chat, NewMessage, ShortUserData, ChatShort, ChatE, UnreadMessagesInfo, MessageImage, NewMessageFront, MessageFullFront } from "./chat.types";
 import type { NextFunction, Request, Response } from "express";
 
 
@@ -15,12 +15,12 @@ export type ChatControllerContract = {
 	getAllMessagesByChat(
 		req: Request<
 			{ chatId: string },
-			MessageFull[],
+			MessageFullFront[],
 			object,
 			{page: string, take: string},
 			AuthenticatedUser
 		>,
-		res: Response<Message[], AuthenticatedUser>,
+		res: Response<MessageFullFront[], AuthenticatedUser>,
 		next: NextFunction,
 	): Promise<void>;
     openPersonalChat(
@@ -81,14 +81,14 @@ export type ChatServiceContract = {
 		chatId: number,
 		take: number,
         page: number
-	): Promise<MessageFull[]>; // Query/Read
+	): Promise<MessageFullFront[]>; // Query/Read
 	sendMessage(dto: CreateMessageDto): Promise<Message>;
     getChatInfo(chatId: number, userId: number): Promise<ChatInfo | null>
     getPersonalChat(userId: number, clientId: number): Promise<ChatInfo>
     getPersonalChats(userId: number): Promise<ChatShort[]>
     markReadMessage(userId: number, messageId: number): Promise<void>
     getUnreadData(userId: number): Promise<UnreadMessagesInfo>
-    sendMessageWithImages(dto: CreateMessageDto): Promise<NewMessage>
+    sendMessageWithImages(dto: CreateMessageDto): Promise<NewMessageFront>
 };
 
 export type ChatRepositoryContract = {
@@ -96,7 +96,7 @@ export type ChatRepositoryContract = {
 		chatId: number,
 		take: number,
         page: number
-	): Promise<MessageFull[]>;
+	): Promise<MessageFullFront[]>;
     markReadMessages(userId: number, messages: {id: number}[]): void;
 	createMessage(data: CreateMessageDto): Promise<Message>;
     getChat(chatId: number): Promise<Chat | null>
@@ -105,7 +105,7 @@ export type ChatRepositoryContract = {
     getShortUserData(userId: number): Promise<ShortUserData | null>
     getPersonalChats(userId: number): Promise<ChatE[]>
     getGroupChats(userId: number): Promise<Chat[]>
-    getChatLastMessage(chatId: number): Promise<MessageFull | null>
+    getChatLastMessage(chatId: number): Promise<MessageFullFront | null>
     getUnreadMessages(chatId: number, userId: number): Promise<number>
     createMessageImage(path: string, messageId: number): Promise<MessageImage>
 };
@@ -116,7 +116,7 @@ export interface ChatClientEvents {
     leaveChat: (payload: {chatId: number}) => void;
 }
 export interface ChatServerEvents {
-	newChatMessage: (message: NewMessage) => void;
+	newChatMessage: (message: NewMessageFront) => void;
 }
 
 export interface ChatSocketControllerContact extends SocketController {
