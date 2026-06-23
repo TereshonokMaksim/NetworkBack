@@ -4,3 +4,6 @@ export interface TokenPayload {
 export interface AuthenticatedUser {
 	userId: number;
 }
+export interface HandledErrorResponse {
+	error: string
+}

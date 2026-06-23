@@ -4,6 +4,7 @@ config();
 
 export const ENV = cleanEnv(process.env, {
     DATABASE_URL: str(),
+    DB_PASSWORD: str(),
     JWT_ACCESS_SECRET_KEY: str(),
     JWT_EXPIRES_IN: str(),
     HOST_EMAIL_ADDRESS: str(),

@@ -1,0 +1,13 @@
+model Chat {
+  id        Int     @id @default(autoincrement())
+  name      String?    @db.VarChar(30)
+  is_group  Boolean
+  avatar    String?    @db.VarChar(100)
+  adminId   Int?    @map("admin_id")
+  admin     User?      @relation("chat_admin", fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "chat_app_chat_admin_id_f1deddb9_fk_user_app_user_id")
+  chatUsers ChatUser[]
+  messages  Message[]
+
+  @@index([adminId], map: "chat_app_chat_admin_id_f1deddb9")
+  @@map("chat_app_chat")
+}

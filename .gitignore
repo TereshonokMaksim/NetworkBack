@@ -8,5 +8,10 @@ node_modules
 
 package-lock.json
 
-media/original/*
-media/thumbnail/*
+media/original/*.*
+media/thumbnail/*.*
+media/original/post/*.*
+media/thumbnail/messages/*.*
+media/original/post/*.*
+media/thumbnail/messages/*.*
+src_save

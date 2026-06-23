@@ -7,11 +7,13 @@ import type {
     UserCreateInput,
     UserWithPassword,
     UserModify,
-    Image,
-    Avatar,
-    UserPowered
+    UserPowered,
+    ProfileU,
+    SubscribeToStatusUpdatesPayload,
+    GetUserStatusesResponse
 } from "./user.types";
 import { AuthenticatedUser } from "../../../types/standartTypes";
+import { ClientSocket, ServerSocket, SocketController } from "../../../socket/socket.types";
 
 export interface UserServiceContract {
     login: (credentials: LoginCredentials) => Promise<{ token: string }>;
@@ -19,9 +21,9 @@ export interface UserServiceContract {
         credentials: RegisterCredentials
     ) => Promise<{ token: string }>;
     me: (dto: MeDTO) => Promise<User>;
-    modify: (userId: number, newData: UserModify, filename?: string) => Promise<User>
+    modify: (userId: number, newData: UserModify, originalImagePath?: string, compressedImagePath?: string) => Promise<User>
     verify: (userId: number, verificationCode: string) => Promise<boolean> 
-    getAvatarById: (avatarId: number) => Promise<string>
+    getProfile: (userId: number, myId: number) => Promise<ProfileU>
 }
 export interface UserRepositoryContract {
     findByEmailWithPassword: (
@@ -31,10 +33,9 @@ export interface UserRepositoryContract {
     create: (data: UserCreateInput) => Promise<User>;
     findById: (id: number) => Promise<User>;
     modify: (userId: number, newData: UserModify) => Promise<User>;
-    createAvatar: (userId: number, imageId: number) => Promise<Avatar>
-    createImage: (originalImagePath: string) => Promise<Image>
-    getImageById: (imageId: number) => Promise<Image>
-    getAvatarById: (avatarId: number) => Promise<Avatar>
+    createAvatar: (userId: number, image: string) => Promise<void>
+    getProfile: (userId: number, myId: number) => Promise<ProfileU>
+    getUserGroupChatIds: (userId: number) => Promise<number[]>
 }
 
 export interface UserControllerContract {
@@ -63,9 +64,32 @@ export interface UserControllerContract {
         res: Response<{success: boolean}, AuthenticatedUser>,
 		next: NextFunction
     ) => void;
-    getAvatar: (
-        req: Request<{id: string}, {avatar: string}, object, AuthenticatedUser>,
-        res: Response<{avatar: string}, AuthenticatedUser>,
-		next: NextFunction
+    getProfile: (
+        req: Request<{id: string}, ProfileU, object, object, AuthenticatedUser>,
+        res: Response<ProfileU, AuthenticatedUser>,
+        next: NextFunction
     ) => void
+}
+
+
+export interface UserClientEvents {
+    userConnect: (payload: object) => void;
+    subscribeToStatusUpdates: (payload: SubscribeToStatusUpdatesPayload) => void
+}
+export interface UserServerEvents {
+    sendUserStatuses: (payload: GetUserStatusesResponse) => void;
+    notifyUser: (payload: {userId: number, isOnline: boolean}) => void;
+}
+
+export interface UserSocketControllerContact extends SocketController {
+    userConnect: (ioServer: ServerSocket, socket: ClientSocket, payload: object) => void;
+    userDisconnect: (ioServer: ServerSocket, socket: ClientSocket, payload: object) => void,
+    subscribeToStatusUpdates: (ioServer: ServerSocket, socket: ClientSocket, payload: SubscribeToStatusUpdatesPayload) => void
+    sendUserStatuses: (ioServer: ServerSocket, socket: ClientSocket, payload: {forUserId: number}) => void;
+    notifyUser: (ioServer: ServerSocket, socket: ClientSocket, payload: {withUserId: number, toUserId: Number}) => void
+}
+
+export interface UserSocketDataContract {
+    userConnectionsMap: Map<number, Set<number>>,
+    userListenerMap: Map<number, Set<number>>,
 }

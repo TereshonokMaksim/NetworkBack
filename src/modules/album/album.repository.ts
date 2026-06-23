@@ -6,9 +6,22 @@ import { AlbumImageForShow } from "./types/album.types";
 
 
 export const AlbumRepository: AlbumRepositoryContract = {
-    async createAlbum(albumName, tagId, userId, year, avatarSpecial) {
+    async createAlbum(albumName, tagName, userId, year) {
         try {
-            return PrismaClient.album.create({data: {name: albumName, tagId: tagId, userId: userId, year: year, avatarOnly: !!avatarSpecial}})
+            const profile = await PrismaClient.profile.findUnique({where: {userId: userId}})
+            const d = {name: albumName, theme: tagName, profileId: profile!.id, year: year, shown: true, createdAt: new Date(), is_default: false}
+            const album = await PrismaClient.album.create({data: d})
+            return {
+                id: album.id,
+                name: album.name,
+                userId: userId,
+                shown: album.shown,
+                createdAt: album.createdAt,
+                previewImageId: -1,
+                avatarOnly: false,
+                tag: album.theme!,
+                year: album.year!
+            }
         }
         catch (error){
             HandleDBError(error)
@@ -17,7 +30,19 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async editAlbum(albumId, newData) {
         try {
-            return PrismaClient.album.update({where: {id: albumId}, data: newData})
+            const album = await PrismaClient.album.update({where: {id: albumId}, data: newData})
+            const user = (await PrismaClient.profile.findUnique({where: {id: album.profileId}, select: {user: true}}))!.user
+            return {
+                id: album.id,
+                name: album.name,
+                userId: user!.id,
+                shown: album.shown,
+                createdAt: album.createdAt,
+                previewImageId: -1,
+                avatarOnly: false,
+                tag: album.theme!,
+                year: album.year!
+            }
         }
         catch (error){
             HandleDBError(error)
@@ -26,7 +51,19 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async getAlbumById(albumId) {
         try {
-            return PrismaClient.album.findUnique({where: {id: albumId}})
+            const album = await PrismaClient.album.findUniqueOrThrow({where: {id: albumId}})
+            const user = (await PrismaClient.profile.findUnique({where: {id: album.profileId}, select: {user: true}}))!.user
+            return {
+                id: album.id,
+                name: album.name,
+                userId: user!.id,
+                shown: album.shown,
+                createdAt: album.createdAt,
+                previewImageId: -1,
+                avatarOnly: false,
+                tag: album.theme!,
+                year: album.year!
+            }
         }
         catch (error){
             HandleDBError(error)
@@ -35,7 +72,20 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async getAlbumsByUserId(userId) {
         try {
-            return PrismaClient.album.findMany({where: {userId}, orderBy: {id: "asc"}})
+            const profileId = (await PrismaClient.profile.findUnique({where: {userId}}))!.id
+            const albums = await PrismaClient.album.findMany({where: {profileId}, orderBy: {id: "asc"}})
+            const newAlbums = albums.map(el => {return {
+                id: el.id,
+                name: el.name,
+                userId: userId,
+                shown: el.shown,
+                createdAt: el.createdAt,
+                previewImageId: -1,
+                avatarOnly: false,
+                tag: el.theme!,
+                year: el.year!
+            }})
+            return newAlbums
         }
         catch (error){
             HandleDBError(error)
@@ -45,7 +95,7 @@ export const AlbumRepository: AlbumRepositoryContract = {
     async deleteAlbum(albumId) {
         try {
             await PrismaClient.albumImage.deleteMany({where: {albumId}})
-            return await PrismaClient.album.delete({where: {id: albumId}})
+            await PrismaClient.album.delete({where: {id: albumId}})
         }
         catch (error){
             HandleDBError(error)
@@ -53,11 +103,10 @@ export const AlbumRepository: AlbumRepositoryContract = {
         }
     },
 
-    async createAlbumImage(originalImagePath, albumId) {
+    async createAlbumImage(originalImagePath, compressedImagePath, albumId) {
         try {
-            const im = await PrismaClient.image.create({data: {originalImagePath: originalImagePath}})
-            const aim = await PrismaClient.albumImage.create({data: {imageId: im.id, albumId}})
-            return {id: aim.id, albumId: aim.albumId, shown: aim.shown, originalImagePath: im.originalImagePath}
+            const aim = await PrismaClient.albumImage.create({data: {image: originalImagePath, albumId, is_shown: true, created_at: new Date()}})
+            return {id: aim.id, albumId: aim.albumId, shown: aim.is_shown, originalImagePath: aim.image}
         }
         catch (error){
             HandleDBError(error)
@@ -66,7 +115,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async createAlbumImageByImage(image, albumId) {
         try {
-            return PrismaClient.albumImage.create({data: {imageId: image.id, albumId}})
+            const aim = await PrismaClient.albumImage.create({data: {image, albumId, is_shown: true, created_at: new Date()}})
+            return {id: aim.id, albumId: aim.albumId, shown: aim.is_shown, image: aim.image}
         }
         catch (error){
             HandleDBError(error)
@@ -75,9 +125,9 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async getAlbumImageByAlbumId(albumId) {
         try {
-            const a = await PrismaClient.albumImage.findMany({where: {albumId}, include: {image: {omit: {createdAt: true, id: true, compressedImagePath: true}}}})
+            const a = await PrismaClient.albumImage.findMany({where: {albumId}})
             const b: AlbumImageForShow[] = []
-            a.forEach((el) => {b.push({id: el.id, albumId: el.albumId, originalImagePath: el.image.originalImagePath, shown: el.shown})})
+            a.forEach((el) => {b.push({id: el.id, albumId: el.albumId, originalImagePath: el.image, shown: el.is_shown})})
             return b
         }
         catch (error){
@@ -87,7 +137,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async getAlbumImageById(imageId) {
         try {
-            return PrismaClient.albumImage.findUnique({where: {id: imageId}})
+            const aim = await PrismaClient.albumImage.findUnique({where: {id: imageId}})
+            return {id: aim!.id, albumId: aim!.albumId, shown: aim!.is_shown, image: aim!.image}
         }
         catch (error){
             HandleDBError(error)
@@ -96,7 +147,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async editAlbumImage(imageId, newData) {
         try {
-            return PrismaClient.albumImage.update({where: {id: imageId}, data: newData})
+            const aim = await PrismaClient.albumImage.update({where: {id: imageId}, data: newData})
+            return {id: aim!.id, albumId: aim!.albumId, shown: aim!.is_shown, image: aim!.image}
         }
         catch (error){
             HandleDBError(error)
@@ -105,26 +157,8 @@ export const AlbumRepository: AlbumRepositoryContract = {
     },
     async deleteAlbumImage(imageId) {
         try {
-            return PrismaClient.albumImage.delete({where: {id: imageId}})
-        }
-        catch (error){
-            HandleDBError(error)
-            throw new InternalServerError("huh")
-        }
-    },
-
-    getAllTags() {
-        try {
-            return PrismaClient.tag.findMany()
-        }
-        catch (error){
-            HandleDBError(error)
-            throw new InternalServerError("huh")
-        }
-    },
-    async getTagById(tagId) {
-        try {
-            return PrismaClient.tag.findUnique({where: {id: tagId}})
+            const aim = await PrismaClient.albumImage.delete({where: {id: imageId}})
+            return {id: aim!.id, albumId: aim!.albumId, shown: aim!.is_shown, image: aim!.image}
         }
         catch (error){
             HandleDBError(error)
@@ -134,7 +168,20 @@ export const AlbumRepository: AlbumRepositoryContract = {
 
     async getUserPersonalAlbum(userId) {
         try {
-            return PrismaClient.album.findFirstOrThrow({where: {userId, name: "Мої фото"}})
+            const prof = await PrismaClient.profile.findUniqueOrThrow({where: {userId}})
+            const ma = await PrismaClient.album.findFirstOrThrow({where: {profileId: prof.id, name: "Мої фото"}})
+            // const userId = await PrismaClient.profile.findUnique({where: {}})
+            return {
+                id: ma.id,
+                name: ma.name,
+                userId: userId,
+                shown: ma.shown,
+                createdAt: ma.createdAt,
+                previewImageId: -1,
+                avatarOnly: false,
+                tag: ma.theme!,
+                year: ma.year!
+            }
         }
         catch (error){
             HandleDBError(error)

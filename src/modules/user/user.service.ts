@@ -56,7 +56,7 @@ export const UserService: UserServiceContract = {
             text: `Hello, this email is about finishing creating your account. Here is the code: ${code}`
         });
 
-		AlbumRepository.createAlbum("Мої фото", 0, createdUser.id, 0, true)
+		AlbumRepository.createAlbum("Мої фото", "", createdUser.id, 0, true)
 
 		return { token };
 	},
@@ -74,11 +74,9 @@ export const UserService: UserServiceContract = {
         }
 		if (filename){
 			console.log("Takoe sebe")
-			const image = await UserRepository.createImage(filename)
-			const avatar = await UserRepository.createAvatar(userId, image.id)
-			await UserRepository.modify(userId, {currentAvatarId: avatar.id})
+			await UserRepository.createAvatar(userId, filename)
 			const myAlbum = await AlbumRepository.getUserPersonalAlbum(userId)
-			await AlbumRepository.createAlbumImageByImage(image, myAlbum.id)
+			await AlbumRepository.createAlbumImage(filename, filename, myAlbum.id)
 		}
         return await UserRepository.modify(userId, {...newData})
     },
@@ -97,15 +95,7 @@ export const UserService: UserServiceContract = {
         }
         return false
     },
-	async getAvatarById(avatarId) {
-		const avatar = await UserRepository.getAvatarById(avatarId)
-		if (!avatar){
-			throw new NotFoundError("Avatar")
-		}
-		const image = await UserRepository.getImageById(avatar.imageId)
-		if (!image){
-			throw new NotFoundError("Image")
-		}
-		return image.originalImagePath
+	async getProfile(userId, myId) {
+		return await UserRepository.getProfile(userId, myId)
 	},
 };

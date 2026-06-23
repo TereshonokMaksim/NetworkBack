@@ -12,7 +12,6 @@ export const AlbumController: AlbumControllerContract = {
     },
     async editAlbum(req, res, next) {
         try {
-            console.log("WTF")
             res.status(200).json(await AlbumService.editAlbum(+req.params.id, req.body))
         } catch (error) {
 			next(error);
@@ -27,7 +26,7 @@ export const AlbumController: AlbumControllerContract = {
     },
     async deleteAlbum(req, res, next) {
         try {
-            res.status(200).json(await AlbumService.deleteAlbum(+req.params.id))
+            res.status(200).json({success: true})
         } catch (error) {
 			next(error);
 		}
@@ -36,12 +35,10 @@ export const AlbumController: AlbumControllerContract = {
     async createAlbumImage(req, res, next) {
         try {
             if (!(req.file?.filename)){
-                console.log("NO IMAGEEEE")
-                console.log(req.file)
                 res.status(400).json()
                 return
             }
-            res.status(200).json(await AlbumService.createAlbumImage(req.file?.filename, +req.params.albumId))
+            res.status(200).json(await AlbumService.createAlbumImage(req.file.originalname, req.file.filename, +req.params.albumId))
         } catch (error) {
 			next(error);
 		}
@@ -66,23 +63,5 @@ export const AlbumController: AlbumControllerContract = {
         } catch (error) {
 			next(error);
 	    }
-    },
-    
-    async getAllTags(req, res, next) {
-        try {
-            const data = await AlbumService.getAllTags()
-            console.log("Processing....")
-            console.log(data)
-            res.status(200).json(data)
-        } catch (error) {
-			next(error);
-		}
-    },
-    async getTagById(req, res, next) {
-        try {
-            res.status(200).json(await AlbumService.getTagById(+req.params.id))
-        } catch (error) {
-			next(error);
-		}
-    },
+    }
 }
